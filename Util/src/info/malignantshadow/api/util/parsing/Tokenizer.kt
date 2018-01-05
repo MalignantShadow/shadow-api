@@ -199,6 +199,7 @@ open class Tokenizer(src: String, val skipWhitespace: Boolean = true) {
      */
     @JvmOverloads
     fun next(skipWhitespace: Boolean = this.skipWhitespace): Token? {
+        if(skipWhitespace) _workingSrc = _workingSrc.trim()
         for ((pattern, type, ignore) in _patterns) {
             if (_workingSrc.isEmpty()) return null
             val m = pattern.matcher(_workingSrc)
