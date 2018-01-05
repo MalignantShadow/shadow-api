@@ -75,7 +75,7 @@ class ShadeConfigProcessor : TextFileConfigProcessor() {
         fun stringify(section: ConfigSection, root: Boolean = true, indentSize: Int = DEF_INDENT_SIZE, indent: Int = 0): String {
             val indentString = "".indent(indentSize, indent)
             val grouped = section.groupBy { it.value }
-            return stringifyIterable(
+            val str = stringifyIterable(
                     if (root) "" else "{",
                     if (root) "" else "}",
                     grouped.entries,
@@ -86,6 +86,8 @@ class ShadeConfigProcessor : TextFileConfigProcessor() {
                         it.value.joinToString(", ", postfix = " ") { stringifyKey(it.key) } +
                         stringify(it.key, indentSize, indent + 1)
             }
+
+            return if(root) str.replace(Regex("(\\s*[}\\]]\\s*)*\$"), "") else str
         }
 
         @JvmStatic
