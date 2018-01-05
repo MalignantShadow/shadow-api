@@ -34,7 +34,7 @@ open class Tokenizer(src: String, val skipWhitespace: Boolean = true) {
          * * #.#
          * * #.#e#
          */
-        const val REGEX_UDOUBLE = "\\d*(\\.\\d+([eE]\\d+)?)\\b"
+        const val REGEX_UDOUBLE = "\\d*(\\.\\d+([eE][+-]?\\d+)?)\\b"
 
         /**
          * The same as a [REGEX_UDOUBLE], but proceeded by an optional sign (+ or -)
