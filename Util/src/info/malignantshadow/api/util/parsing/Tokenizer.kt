@@ -108,7 +108,7 @@ open class Tokenizer(src: String, val skipWhitespace: Boolean = true) {
         fun string(single: Boolean = true, double: Boolean = true, newlines: Boolean = false): String {
             require(single || double) { "'single' or 'double' must be true" }
             val chars = (if (single) "'" else "") + (if (double) "\"" else "")
-            return "([$chars])(?:[^\\\\$chars${if (!newlines) "\\n\\r\\f" else ""}]|\\\\[${chars}ntrf])*\\2(?![^\\s])"
+            return "([$chars])(?:[^\\\\$chars${if (!newlines) "\\n\\r\\f" else ""}]|\\\\[${chars}ntrf])*\\2"
         }
 
         /**
