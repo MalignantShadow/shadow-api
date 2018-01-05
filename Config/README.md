@@ -40,7 +40,7 @@ Shade is a config  format that I've designed. It's similar in syntax to JSON, wi
 Processing for Shade is handled via the
 [ShadeConfigProcessor](src/info/malignantshadow/api/config/processor/types/ShadeConfigProcessor.kt) class
 
-## Why's It Called 'Shade?' ... Weirdo
+## Why's it called 'Shade?' ... Weirdo
 Configuration systems aren't really named after their purpose (usually). The name is a reference to my screen name,
 MalignantShadow (or sometimes Shad0w), as well as a reference to another project that I'm keeping secret for now.
 
