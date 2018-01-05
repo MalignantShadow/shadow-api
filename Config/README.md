@@ -12,11 +12,11 @@ Keys are non-null `String`s that can be empty
 
 # JSON
 JSON configuration processing is available via the
-[JsonConfigProcessor](src/info/malignantshadow/api/config/processor/JsonConfigProcessor) class.
+[JsonConfigProcessor](processor/JsonConfigProcessor) class.
 
 # YAML
 Similarly, YAML configuration processing is available via the
-[JsonConfigProcessor](src/info/malignantshadow/api/config/processor/JsonConfigProcessor) class. It uses
+[JsonConfigProcessor](processor/JsonConfigProcessor) class. It uses
 [SnakeYAML](//bitbucket.org/asomov/snakeyaml) as a backend
 
 # Shade
