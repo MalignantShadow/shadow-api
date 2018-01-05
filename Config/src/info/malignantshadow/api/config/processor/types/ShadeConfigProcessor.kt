@@ -28,8 +28,9 @@ class ShadeConfigProcessor : TextFileConfigProcessor() {
         private const val KEY_SEPARATOR = 11
         private const val START_ARRAY = 12
         private const val END_ARRAY = 13
-        private const val COMMENT = 14
-        private const val IDENTIFIER = 15
+        private const val LINE_COMMENT = 14
+        private const val BLOCK_COMMENT = 15
+        private const val IDENTIFIER = 16
 
         const val DEF_INDENT_SIZE = 2
 
@@ -52,7 +53,11 @@ class ShadeConfigProcessor : TextFileConfigProcessor() {
             t.addTokenType(",", KEY_SEPARATOR)
             t.addTokenType("\\[", START_ARRAY)
             t.addTokenType("\\]", END_ARRAY)
-            t.addTokenType("(#|;|//).*", COMMENT, true)
+            t.addTokenType(
+                    Tokenizer.blockComment("###") + "|" +
+                            Tokenizer.blockComment("/\\*", "\\*/"),
+                    BLOCK_COMMENT, true)
+            t.addTokenType(Tokenizer.lineComment("(#|;|//)"), LINE_COMMENT, true)
             t.addTokenType(Tokenizer.REGEX_IDENTIFIER_WITH_DASHES, IDENTIFIER)
             return t
         }
