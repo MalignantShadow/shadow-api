@@ -16,7 +16,7 @@ JSON configuration processing is available via the
 
 # YAML
 Similarly, YAML configuration processing is available via the
-[JsonConfigProcessor](src/info/malignantshadow/api/config/processor/types/JsonConfigProcessor.kt) class. It uses
+[YamlConfigProcessor](src/info/malignantshadow/api/config/processor/types/YamlConfigProcessor.kt) class. It uses
 [SnakeYAML](//bitbucket.org/asomov/snakeyaml) as a backend
 
 # Shade
