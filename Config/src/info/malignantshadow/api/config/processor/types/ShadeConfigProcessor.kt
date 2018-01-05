@@ -6,7 +6,6 @@ import info.malignantshadow.api.config.ConfigPair
 import info.malignantshadow.api.config.ConfigSection
 import info.malignantshadow.api.config.ConfigSequence
 import info.malignantshadow.api.config.ConfigValue
-import info.malignantshadow.api.config.Configs
 import info.malignantshadow.api.config.processor.TextFileConfigProcessor
 import info.malignantshadow.api.util.extensions.escape
 import info.malignantshadow.api.util.extensions.indent
@@ -223,65 +222,3 @@ class ShadeConfigProcessor : TextFileConfigProcessor() {
     }
 
 }
-
-fun main(args: Array<String>) {
-    val shade = """
-        # I am a comment
-        key, another_key {
-            rawr "string"
-        # Comment
-        }
-        hello "there"
-        i_am "will"
-    """.trimIndent()
-    val config = Configs.shade()[shade]
-    println(ShadeConfigProcessor.stringify(config, 0))
-}
-
-/*
-
-GRAMMAR
-============================================================================================================
-number :=
-    <int> |             ; Integer
-    <double>            ; Double
-
-primitive :=
-    true            |   ; Boolean true
-    false           |   ; Boolean false
-    null            |   ; null value
-    <quoted-string> |   ; String
-    <number>
-
-value :=
-    <primitive> |
-    <expr>      |
-    <map>       |
-    <array>
-
-op :=
-    +   |               ; Addition
-    -   |               ; Subtraction
-    *   |               ; Multiplication
-    /   |               ; Division
-    %   |               ; Modulus (get the remainder)
-    '|' |               ; Logical OR (booleans)
-    &                   ; Logical AND (booleans)
-
-lazy-val := (<expr>|<value>)
-
-expr := '('<lazy-val>(<op><lazy-val>)*')'
-
-pair := <identifier>:(<value>|<expr>)
-
-map := {<pair>*}
-
-array :=  [<lazy-val)*]
-
-NOTES
-============================================================================================================
-(OoO = Order of Operations)
-1. Unlike most configurations, arrays and maps do not need commas
-   to separate their values, since each value is a single token
-2. Due to the way this configuration is parsed, everything can be expressed on a single line (neat!)
- */
