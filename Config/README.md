@@ -37,6 +37,13 @@ Shade is a config  format that I've designed. It's similar in syntax to JSON, wi
   * This design choice was due the fact that, sometimes, JSON files are clustered with `]` and `{` at the end, which
     (in my opinion) is unsightly.
 
+Processing for Shade is handled via the
+[ShadeConfigProcessor](src/info/malignantshadow/api/config/processor/types/ShadeConfigProcessor.kt) class
+
+## Why's It Called 'Shade?' ... Weirdo
+Configuration systems aren't really named after their purpose (usually). The name is a reference to my screen name,
+MalignantShadow (or sometimes Shad0w), as well as a reference to another project that I'm keeping secret for now.
+
 ## What does it look like?
 Good question! Here's an example, which is basically a `package.json` converted to Shade
 
