@@ -26,14 +26,16 @@ Shade is a config  format that I've designed. It's similar in syntax to JSON, wi
 * `,` is not used to separate values in lists or key/value pairs in maps
 * `:` is unused. Spaces separate keys and values.
 * Like YAML, keys do not need quotes unless they would otherwise be mistaken as something else, like a number.
-* The keywords 'on' and 'yes' can be used instead of 'true', and will be preserved if not overwritten
-* The keywords 'off' and 'no' can be used instead of 'false', and will be preserved if not overwritten
+* The keywords `on` and `yes` can be used instead of `true`, and will be preserved if not overwritten
+* The keywords `off` and `no` can be used instead of `false`, and will be preserved if not overwritten
 * Strings can be represent with single-quotes as well as double-quotes
 * Multiple keys can be separated with a comma (`,`) for a specific value. Note that each key has a value that is
   *structurally* identical (`==`) but not actually the same object (`===`)
 * The closing characters `]` (for arrays) and `}` (for maps) are optional if they are the last item.
   * Internally, this is handled by simply returning the map/array when the end of the source string has been reached
   (at an appropriate time)
+  * This design choice was due the fact that, sometimes, JSON files are clustered with `]` and `{` at the end, which
+    (in my opinion) is unsightly.
 
 ## What does it look like?
 Good question! Here's an example, which is basically a `package.json` converted to Shade
@@ -62,7 +64,7 @@ dependencies {
   material-ui-icons "^1.0.0-beta.15"
   typeface-roboto   "0.0.35"
 ```
-(Note how the last '}' is missing, this is perfectly fine, because 'dependencies' is the last item)
+(Note how the last `}` is missing, this is perfectly fine, because 'dependencies' is the last item)
 
 Here's a more complex example:
 
@@ -90,7 +92,7 @@ fireteam {
   ]
 }
 ```
-Let's make this a bit prettier by add some whitespace and removing several characters:
+Let's make this a bit prettier by adding some whitespace and removing several characters:
 ```plaintext
 fireteam {
   name "Intrepid"
