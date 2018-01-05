@@ -88,6 +88,11 @@ open class Tokenizer(src: String, val skipWhitespace: Boolean = true) {
             return "$string[$allowedChars]*$string"
         }
 
+        fun lineComment(prefix: String) = "$prefix.*"
+
+        @JvmOverloads
+        fun blockComment(prefix: String, postfix: String = prefix) = "$prefix(.|[\\r\\n])*?($postfix|\$)"
+
         /**
          * Constructs a regex that matches a string literal in most languages. The following
          * escapes are supported by the returned regex:
