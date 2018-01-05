@@ -53,7 +53,7 @@ class ShadeConfigProcessor : TextFileConfigProcessor() {
             t.addTokenType("\\[", START_ARRAY)
             t.addTokenType("\\]", END_ARRAY)
             t.addTokenType("(#|;|//).*", COMMENT, true)
-            t.addTokenType(Tokenizer.REGEX_IDENTIFIER, IDENTIFIER)
+            t.addTokenType(Tokenizer.REGEX_IDENTIFIER_WITH_DASHES, IDENTIFIER)
             return t
         }
 
