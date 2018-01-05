@@ -38,7 +38,7 @@ class ShadeConfigProcessor : TextFileConfigProcessor() {
 
         private fun createTokenizer(): Tokenizer {
             val t = Tokenizer("")
-            t.addTokenType(Tokenizer.string(), STRING)
+            t.addTokenType(Tokenizer.string() + "(?![^\\s[\\]{}])", STRING)
             t.addTokenType(Tokenizer.REGEX_DOUBLE, DOUBLE)
             t.addTokenType(Tokenizer.REGEX_INT, INT)
 //          t.addTokenType("\\(", START_EXPR)
