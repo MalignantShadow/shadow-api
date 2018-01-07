@@ -1,20 +1,19 @@
 package info.malignantshadow.api.util.aliases
 
-class Aliases {
-    companion object Static {
-        fun test(alias: String?, notNull: Boolean, notEmpty: Boolean, noSpaces: Boolean): String? {
-            if(alias == null)
-                return if(notNull) "alias cannot be null" else null
+fun String?.testAlias(notNull: Boolean, notEmpty: Boolean, noWhitespace: Boolean): String? {
+    if (this == null)
+        return if (notNull) "alias cannot be null" else null
 
-            if(notEmpty && alias.isEmpty()) return "alias cannot be empty"
-            if(noSpaces && alias.contains(" ")) return "alias cannot contains spaces"
+    if (notEmpty && isEmpty()) return "alias cannot be empty"
+    if (noWhitespace && contains(Regex("\\s+"))) return "alias cannot contain whitespace"
 
-            return null
-        }
+    return null
+}
 
-        fun check(alias: String?, notNull: Boolean, notEmpty: Boolean, noSpaces: Boolean) {
-            val result = test(alias, notNull, notEmpty, noSpaces)
-            result ?: throw IllegalArgumentException(result)
-        }
-    }
+fun String?.isValidAlias(notNull: Boolean, notEmpty: Boolean, noWhitespace: Boolean): Boolean =
+        testAlias(notNull, notEmpty, noWhitespace) != null
+
+fun String?.checkAlias(notNull: Boolean, notEmpty: Boolean, noWhitespace: Boolean) {
+    val result = testAlias(notNull, notEmpty, noWhitespace)
+    require(result == null) { result!! }
 }

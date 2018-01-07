@@ -1,6 +1,6 @@
 package info.malignantshadow.api.util.arguments
 
-import info.malignantshadow.api.util.aliases.Aliases
+import info.malignantshadow.api.util.aliases.checkAlias
 
 open class Argument(
         val name: String,
@@ -10,7 +10,7 @@ open class Argument(
 ) {
 
     init {
-        Aliases.check(name, true, true, true)
+        name.checkAlias(true, true, true)
     }
 
     companion object Static {
