@@ -2,6 +2,9 @@ package info.malignantshadow.api.config
 
 /**
  * Represents a configuration value that can be represented as a string
+ *
+ * @param value The value
+ * @param literal The string that represents the value
  * @author Shad0w (Caleb Downs)
  */
 open class ConfigValue<out T>(val value: T, val literal: String) : ConfigCopyable {
@@ -29,7 +32,7 @@ open class ConfigValue<out T>(val value: T, val literal: String) : ConfigCopyabl
      * if `this === other` || other.value == this.value
      *
      * @param other The other value
-     * @return `true` if the values are equal to each other
+     * @return `true` if the values are equal to each
      */
     fun equals(other: ConfigValue<*>) = other === this || other.value == value
 

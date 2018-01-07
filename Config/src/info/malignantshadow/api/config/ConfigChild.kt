@@ -7,5 +7,9 @@ package info.malignantshadow.api.config
 abstract class ConfigChild {
 
     open internal var parentInternal: ConfigChild? = null
+
+    /**
+     * The parent of this object
+     */
     val parent: ConfigChild? get() = parentInternal
 }
