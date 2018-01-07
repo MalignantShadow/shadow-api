@@ -7,9 +7,18 @@ import org.yaml.snakeyaml.Yaml
 import java.io.FileWriter
 import java.io.IOException
 
+/**
+ * A [info.malignantshadow.api.config.ConfigProcessor] that is used to handle JSON configurations. Internally,
+ * this class utilizes an instance of [Yaml] as a backend.
+ * @author Shad0w (Caleb Downs)
+ */
 class YamlConfigProcessor : TextFileConfigProcessor {
 
     private lateinit var _yaml: Yaml
+
+    /**
+     * The [Yaml] object used for the backend
+     */
     val yaml = _yaml
 
     private companion object {
@@ -25,31 +34,45 @@ class YamlConfigProcessor : TextFileConfigProcessor {
 
     }
 
+    /**
+     * Construct a YamlConfigProcessor with the given options to be used in a [DumperOptions] object
+     */
     @JvmOverloads
     constructor(indentSize: Int = 2, width: Int = 200, blockStyle: Boolean = true) :
             this(createDumperOptions(indentSize, width, if (blockStyle) DumperOptions.FlowStyle.BLOCK else DumperOptions.FlowStyle.FLOW))
 
+    /**
+     * Construct a YamlConfigProcessor with the given [DumperOptions]
+     */
     constructor(options: DumperOptions) {
         _yaml = Yaml(options)
     }
 
+    /**
+     * Get a ConfigSection from the given YAML source
+     */
     override fun get(src: String) = get(_yaml.load(src))
 
     private fun get(it: Any?): ConfigSection? {
-        if(it !is Map<*, *>) return null
+        if (it !is Map<*, *>) return null
         return ConfigSection.from(it)
     }
 
-    override fun set(writer: FileWriter, document: ConfigSection): Boolean {
+    override fun set(writer: FileWriter, section: ConfigSection): Boolean {
         return try {
-            _yaml.dump(document.toMap(), writer)
+            _yaml.dump(section.toMap(), writer)
             writer.close()
             true
-        } catch(e: IOException) {
+        } catch (e: IOException) {
             false
         }
     }
 
-    fun dump(document: ConfigSection) = _yaml.dump(document.toMap())
+    /**
+     * Stringify a [ConfigSection] as a YAML string
+     *
+     * @param section The ConfigSection
+     */
+    fun dump(section: ConfigSection) = _yaml.dump(section.toMap())
 
 }

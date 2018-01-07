@@ -3,7 +3,12 @@ package info.malignantshadow.api.config
 import info.malignantshadow.api.config.processor.types.JsonConfigProcessor
 import info.malignantshadow.api.config.processor.types.ShadeConfigProcessor
 import info.malignantshadow.api.config.processor.types.YamlConfigProcessor
+import org.yaml.snakeyaml.DumperOptions
 
+/**
+ * Helper object for Configurations
+ * @author Shad0w (Caleb Downs)
+ */
 object Configs {
 
     object FileAssociations {
@@ -28,7 +33,7 @@ object Configs {
 
 
     @JvmStatic
-    fun getValue(value: Any?): Any? = when(value) {
+    fun getValue(value: Any?): Any? = when (value) {
         is List<*> -> ConfigSequence.from(value)
         is Map<*, *> -> ConfigSection.from(value)
         else -> value
@@ -38,6 +43,9 @@ object Configs {
     @JvmOverloads
     fun yaml(indentSize: Int = 2, width: Int = 200, blockStyle: Boolean = true) =
             YamlConfigProcessor(indentSize, width, blockStyle)
+
+    @JvmStatic
+    fun yaml(options: DumperOptions) = YamlConfigProcessor(options)
 
     @JvmStatic
     fun json() = JsonConfigProcessor()

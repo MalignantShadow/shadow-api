@@ -12,7 +12,15 @@ import info.malignantshadow.api.util.extensions.indent
 import info.malignantshadow.api.util.extensions.unescape
 import info.malignantshadow.api.util.parsing.Tokenizer
 import java.io.FileWriter
+import java.io.IOException
 
+/**
+ *
+ * A [info.malignantshadow.api.config.ConfigProcessor] that is used to handle Shade configurations. Internally,
+ * this class utilizes an instance of [Tokenizer] to read through the source and parse the Shade string accordingly.
+ *
+ * @author Shad0w (Caleb Downs)
+ */
 class ShadeConfigProcessor : TextFileConfigProcessor() {
 
     companion object {
@@ -32,10 +40,19 @@ class ShadeConfigProcessor : TextFileConfigProcessor() {
         private const val BLOCK_COMMENT = 15
         private const val IDENTIFIER = 16
 
+        /**
+         * The default indentation size
+         */
         const val DEF_INDENT_SIZE = 2
 
-        val REGEX_TRUE = Tokenizer.keyword("true|on|yes")
-        val REGEX_FALSE = Tokenizer.keyword("false|off|no")
+        /**
+         * A Regular Expression that matches a token that would evaluate to `true`
+         */
+        val REGEX_TRUE = Tokenizer.keyword("true", "on", "yes")
+        /**
+         * A Regular Expression that matches a token that would evaluate to `false`
+         */
+        val REGEX_FALSE = Tokenizer.keyword("false", "off", "no")
 
         private fun createTokenizer(): Tokenizer {
             val t = Tokenizer("")
@@ -70,9 +87,24 @@ class ShadeConfigProcessor : TextFileConfigProcessor() {
             else key
         }
 
+        private fun stringifyKeys(pairs: List<ConfigPair>) =
+                pairs.joinToString(", ", postfix = " ") { stringifyKey(it.key) }
+
+        /**
+         * Stringify a ConfigSection. If `root` is `true` and `indentSize` is `0`, then the ending braces
+         * of lists and maps will be removed from the end of the result string. More specifically,
+         * `replace(Regex("(\\s*[}\\]]\\s*)*\$"), "")` is invoked on the result string.
+         *
+         * @param section The ConfigSection to stringify
+         * @param indentSize The indenting size
+         * @param indent The initial level of indentation
+         * @param root Whether the given ConfigSection is the root of the configuration. If `true`, curly
+         * braces will not be added in the ends of the string
+         * @return a string that accurately represents the given ConfigSection
+         */
         @JvmStatic
         @JvmOverloads
-        fun stringify(section: ConfigSection, root: Boolean = true, indentSize: Int = DEF_INDENT_SIZE, indent: Int = 0): String {
+        fun stringify(section: ConfigSection, indentSize: Int = DEF_INDENT_SIZE, indent: Int = 0, root: Boolean = true): String {
             val indentString = "".indent(indentSize, indent)
             val grouped = section.groupBy { it.value }
             val str = stringifyIterable(
@@ -82,14 +114,20 @@ class ShadeConfigProcessor : TextFileConfigProcessor() {
                     indentSize,
                     indent
             ) {
-                indentString +
-                        it.value.joinToString(", ", postfix = " ") { stringifyKey(it.key) } +
-                        stringify(it.key, indentSize, indent + 1)
+                indentString + stringifyKeys(it.value) + stringify(it.key, indentSize, indent + 1)
             }
 
-            return if(root) str.replace(Regex("(\\s*[}\\]]\\s*)*\$"), "") else str
+            return if (root && indentSize <= 0) str.replace(Regex("(\\s*[}\\]]\\s*)*\$"), "") else str
         }
 
+        /**
+         * Stringify a ConfigSequence
+         *
+         * @param seq The ConfigSequence
+         * @param indentSize The indenting size
+         * @param indent The initial level of indentation
+         * @return a string that accurately represents the given ConfigSequence
+         */
         @JvmStatic
         @JvmOverloads
         fun stringify(seq: ConfigSequence, indentSize: Int = DEF_INDENT_SIZE, indent: Int = 0): String {
@@ -122,12 +160,21 @@ class ShadeConfigProcessor : TextFileConfigProcessor() {
             return iterable.joinToString(separator, prefix, postfix, transform = transform)
         }
 
+
+        /**
+         * Stringify a value into the appropriate Shade format
+         *
+         * @param value The value
+         * @param indentSize The indenting size
+         * @param indent The initial level of indentation
+         * @return a string that accurately represents the given value
+         */
         @JvmStatic
         @JvmOverloads
         fun stringify(value: Any?, indentSize: Int = 0, indent: Int = 0): String =
                 when (value) {
                     is String -> "\"${value.toString().escape()}\""
-                    is ConfigSection -> stringify(value, false, indentSize, indent).trim()
+                    is ConfigSection -> stringify(value, indentSize, indent, false).trim()
                     is ConfigSequence -> stringify(value, indentSize, indent).trim()
                     is ConfigValue<*> -> value.literal
                     else -> value.toString()
@@ -137,6 +184,13 @@ class ShadeConfigProcessor : TextFileConfigProcessor() {
 
     private val tokenizer by lazy { createTokenizer() }
 
+    /**
+     * Get a [ConfigSection] from a Shade config string
+     *
+     * @param src The source string
+     * @return a [ConfigSection] accurately represented by the given source
+     */
+    @Synchronized
     override fun get(src: String): ConfigSection {
         tokenizer.src = src
         return getMap(false)
@@ -177,7 +231,12 @@ class ShadeConfigProcessor : TextFileConfigProcessor() {
             //get keys
             val keys = ArrayList<String>()
             while (true) {
-                keys.add(token!!.match)
+                token!!
+
+                keys.add(
+                        if(token.type == STRING)
+                            token.match.substring(1, token.match.lastIndex).unescape()
+                        else token.match)
                 token = tokenizer.nextOrError()
 
                 if (token.type != KEY_SEPARATOR) break
@@ -224,8 +283,18 @@ class ShadeConfigProcessor : TextFileConfigProcessor() {
         else -> tokenizer.unexpected(token.match, "a STRING, DOUBLE, INT, TRUE, FALSE, NULL, START_MAP, START_ARRAY")
     }
 
-    override fun set(writer: FileWriter, document: ConfigSection): Boolean {
-        return false
+    override fun set(writer: FileWriter, section: ConfigSection): Boolean {
+        return putDocument(section, writer, DEF_INDENT_SIZE)
     }
+
+    @JvmOverloads
+    fun putDocument(section: ConfigSection, writer: FileWriter, indentSize: Int, indent: Int = 0): Boolean =
+            try {
+                writer.write(stringify(section, indentSize, indent))
+                true
+            } catch (e: IOException) {
+                e.printStackTrace()
+                false
+            }
 
 }

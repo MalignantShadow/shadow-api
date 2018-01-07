@@ -12,6 +12,12 @@ import info.malignantshadow.api.util.parsing.Tokenizer
 import java.io.FileWriter
 import java.io.IOException
 
+/**
+ * A [info.malignantshadow.api.config.ConfigProcessor] that is used to handle JSON configurations. Internally,
+ * this class utilizes an instance of [Tokenizer] to read through the source and parse the JSON accordingly.
+ *
+ * @author Shad0w (Caleb Downs)
+ */
 class JsonConfigProcessor : TextFileConfigProcessor() {
 
     companion object {
@@ -29,8 +35,19 @@ class JsonConfigProcessor : TextFileConfigProcessor() {
         private const val DOUBLE = 10
         private const val INT = 11
 
+        /**
+         * The default indent size when producing JSON output
+         */
         const val DEF_INDENT_SIZE = 2
 
+        /**
+         * Stringify a [ConfigSection] as a JSON Object
+         *
+         * @param section The ConfigSection
+         * @param indentSize The indenting size
+         * @param indent The initial level of indentation
+         * @return a string that accurately represents the given ConfigSection
+         */
         @JvmStatic
         @JvmOverloads
         fun stringify(section: ConfigSection, indentSize: Int = DEF_INDENT_SIZE, indent: Int = 0): String {
@@ -40,6 +57,14 @@ class JsonConfigProcessor : TextFileConfigProcessor() {
             }
         }
 
+        /**
+         * Stringify a [ConfigSequence] as a JSON Array
+         *
+         * @param seq The ConfigSequence
+         * @param indentSize The indenting size
+         * @param indent The initial level of indentation
+         * @return a string that accurately represents the given ConfigSequence
+         */
         @JvmStatic
         @JvmOverloads
         fun stringify(seq: ConfigSequence, indentSize: Int = DEF_INDENT_SIZE, indent: Int = 0): String {
@@ -66,6 +91,14 @@ class JsonConfigProcessor : TextFileConfigProcessor() {
             return iterable.joinToString(separator, prefix, postfix, transform = transform)
         }
 
+        /**
+         * Stringify a value into the appropriate JSON format
+         *
+         * @param value The value
+         * @param indentSize The indenting size
+         * @param indent The initial level of indentation
+         * @return a string that accurately represents the given value
+         */
         @JvmStatic
         @JvmOverloads
         fun stringify(value: Any?, indentSize: Int = 0, indent: Int = 0): String =
@@ -98,6 +131,12 @@ class JsonConfigProcessor : TextFileConfigProcessor() {
         t
     }
 
+    /**
+     * Get a [ConfigSection] from a JSON Object string
+     *
+     * @param src The source string
+     * @return a [ConfigSection] accurately represented by the given source string
+     */
     @Synchronized
     override fun get(src: String): ConfigSection {
         tokenizer.src = src
@@ -164,14 +203,22 @@ class JsonConfigProcessor : TextFileConfigProcessor() {
         else -> tokenizer.unexpected(token.match)
     }
 
-    override fun set(writer: FileWriter, document: ConfigSection): Boolean {
-        return putDocument(document, writer, JsonConfigProcessor.DEF_INDENT_SIZE)
+    override fun set(writer: FileWriter, section: ConfigSection): Boolean {
+        return set(writer, DEF_INDENT_SIZE, 0, section)
     }
 
-    @JvmOverloads
-    fun putDocument(document: ConfigSection, writer: FileWriter, indentSize: Int, indent: Int = 0): Boolean =
+    /**
+     * Write a [ConfigSection] to the given file writer in JSON format
+     *
+     * @param writer The file writer
+     * @param indentSize The indenting size
+     * @param indent The initial level of indentation
+     * @param section The ConfigSection
+     * @return `true` if no Exceptions occur
+     */
+    operator fun set(writer: FileWriter, indentSize: Int = DEF_INDENT_SIZE, indent: Int = 0, section: ConfigSection): Boolean =
             try {
-                writer.write(JsonConfigProcessor.stringify(document, indentSize, indent))
+                writer.write(stringify(section, indentSize, indent))
                 true
             } catch (e: IOException) {
                 e.printStackTrace()

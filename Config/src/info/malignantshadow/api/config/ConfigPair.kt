@@ -2,10 +2,20 @@ package info.malignantshadow.api.config
 
 import info.malignantshadow.api.util.arguments.ArgumentTypes
 
+/**
+ *
+ */
 infix fun String.withValue(value: Any?): ConfigPair = ConfigPair(this, value)
 
+/**
+ *
+ * @author Shad0w (Caleb Downs)
+ */
 class ConfigPair(val key: String, value: Any? = null) : ConfigChild(), ConfigCopyable {
 
+    /**
+     * The value
+     */
     var value = value
         set(value) {
             field = value
@@ -19,65 +29,111 @@ class ConfigPair(val key: String, value: Any? = null) : ConfigChild(), ConfigCop
             super.parentInternal = value
         }
 
+    /**
+     * The key
+     */
     operator fun component1() = key
+
+    /**
+     * The value
+     */
     operator fun component2() = value
 
+    /**
+     * Get a ConfigPair from this ConfigPair, if the value is a [ConfigSection]
+     * @param key The key
+     * @param path Other keys to act as a path
+     * @return the value, or null if the value is not a [ConfigSection]
+     */
     @Suppress("ReplaceGetOrSet")
     operator fun get(key: String, vararg path: String): ConfigPair? {
         return if (!isSection()) null
         else asSection().get(key, *path)
     }
 
-    inline fun <reified T> asOrNull() = if(value is T) value as T else null
-
+    /**
+     * Indicates whether the value of this pair is a [ConfigValue]
+     * @return true if the value is a [ConfigSection]
+     */
     fun isSection() = value is ConfigSection
+
+    /**
+     * Get the value of this pair as a [ConfigSection]
+     * @return the value as a [ConfigSection]
+     */
     fun asSection() = value as ConfigSection
-    fun asSectionOrNull() = asOrNull<ConfigSection>()
 
+    /**
+     * Indicates whether the value of this pair is a [ConfigSequence]
+     * @return true if this value is a [ConfigSequence]
+     */
     fun isSequence() = value is ConfigSequence
-    fun asSequence() = value as ConfigSequence
-    fun asSequenceOrNull() = asOrNull<ConfigSequence>()
 
+    /**
+     * Get the value of this pair as a [ConfigSequence]
+     */
+    fun asSequence() = value as ConfigSequence
+
+    /**
+     * Indicates whether the value of this pair is a [Boolean] or a [ConfigBoolean]
+     */
     fun isBoolean() = value == null || value is Boolean || value is ConfigBoolean
+
+    /**
+     * Get the value of this pair as a [Boolean]
+     * @return the value as a Boolean
+     */
     fun asBoolean() = when (value) {
         null -> false
         is ConfigBoolean -> (value as ConfigBoolean).value
         else -> value as Boolean
     }
-    fun asBooleanOrNull() = if(isBoolean()) asBoolean() else null
 
+    /**
+     * Indicates whether the value of this pair is a Number
+     */
     fun isNumber() = value is Number
-    fun asNumber() = when(value) {
+
+    /**
+     * Get the value of this pair as a [Number]
+     * @return the value as a Number
+     */
+    fun asNumber() = when (value) {
         null -> 0
         is ConfigNumber<*> -> (value as ConfigNumber<*>).value
         is String -> ArgumentTypes.NUMBER(value as String)
         else -> value as Number
     }
-    fun asNumberOrNull() = if(isNumber()) asNumber() else null
 
+    /**
+     * Indicates whether the value of this pair is a String
+     */
     fun isString() = value is String
-    fun asString() = when {
-        isString() -> value as String
-        value == null -> "null"
-        else -> value.toString()
-    }
 
-    override fun equals(other: Any?) = if(other is ConfigPair) equals(other) else super.equals(other)
+    /**
+     * Get the value of this pair as String
+     *
+     * Equivalent to `value.toString()`
+     */
+    fun asString() = value.toString()
 
-    fun equals(other: ConfigPair): Boolean {
-        if(other === this) return true
-        return key == other.key && value == other.value
-    }
+    override fun equals(other: Any?) = if (other is ConfigPair) equals(other) else super.equals(other)
 
-    override fun copy() = when(value) {
+    /**
+     * Indicates whether the given ConfigPair is equal to this one. More specifically,
+     * if the two keys and values are equal to each other
+     */
+    fun equals(other: ConfigPair) = other === this || (other.key == key && other.value == value)
+
+    override fun copy() = when (value) {
         is ConfigCopyable -> ConfigPair(key, (value as ConfigCopyable).copy())
         else -> ConfigPair(key, value)
     }
 
-    override fun isLastInTree(): Boolean {
-        val section = parent as? ConfigSection ?: throw IllegalStateException("parent is not ConfigSection")
-        val lastLocal = section.pairs[section.lastIndex].key == key
-        return lastLocal && section.isLastInTree()
+    override fun hashCode(): Int {
+        var result = key.hashCode()
+        result = 31 * result + (value?.hashCode() ?: 0)
+        return result
     }
 
 }

@@ -7,15 +7,33 @@ import java.nio.file.Path
 
 abstract class BinaryFileConfigProcessor : FileConfigProcessor() {
 
-    operator fun set(path: String, document: ConfigSection)  =
-            set(FileOutputStream(path), document)
+    /**
+     * Write a [ConfigSection] to file represented by the given path
+     *
+     * @param path The path to the file
+     * @param section The ConfigSection
+     */
+    operator fun set(path: String, section: ConfigSection) =
+            set(FileOutputStream(path), section)
 
-    operator fun set(path: Path, document: ConfigSection): Boolean {
-        if(Files.exists(path) && Files.isDirectory(path)) return false
+    /**
+     * Write a [ConfigSection] to file represented by the given path
+     *
+     * @param path The path to the file
+     * @param section The ConfigSection
+     */
+            operator fun set(path: Path, section: ConfigSection): Boolean {
+        if (Files.exists(path) && Files.isDirectory(path)) return false
 
-        return set(FileOutputStream(path.toString()), document)
+        return set(FileOutputStream(path.toString()), section)
     }
 
-    abstract operator fun set(stream: FileOutputStream, document: ConfigSection): Boolean
+    /**
+     * Write a [ConfigSection] to the given [FileOutputStream]
+     *
+     * @param stream The output stream
+     * @param section The ConfigSection
+     */
+    abstract operator fun set(stream: FileOutputStream, section: ConfigSection): Boolean
 
 }
