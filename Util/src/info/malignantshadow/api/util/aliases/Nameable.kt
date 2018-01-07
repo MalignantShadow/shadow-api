@@ -1,5 +1,5 @@
 package info.malignantshadow.api.util.aliases
 
-open interface Nameable {
+interface Nameable {
    val name: String
 }
