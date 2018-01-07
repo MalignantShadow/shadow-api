@@ -1,6 +1,4 @@
-(Javadoc unfinished/unpublished)
-
-#ShadowAPI/Config
+# ShadowAPI/Config
 
 This module provides a means to process configuration files into a single, simple format. Most popular configuration
 types support key/value pairs, arrays, and maps.
