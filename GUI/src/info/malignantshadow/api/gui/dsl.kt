@@ -45,63 +45,183 @@ interface SwtContainer {
 
     val container: Composite
 
+    /**
+     * Create a [Composite] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the Composite
+     */
     fun composite(style: Int = SWT.DEFAULT, init: SwtComposite.() -> Unit = {}) =
             build(SwtComposite(container, style), init)
 
+    /**
+     * Create a [Button] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the Button
+     */
     fun button(style: Int = SWT.DEFAULT, init: SwtButton.() -> Unit = {}) =
             build(SwtButton(container, style), init)
 
+    /**
+     * Create a [Canvas] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the Canvas
+     */
     fun canvas(style: Int = SWT.DEFAULT, init: SwtCanvas.() -> Unit = {}) =
             build(SwtCanvas(container), init)
 
+    /**
+     * Create a [Combo] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the Combo
+     */
     fun combo(style: Int = SWT.DEFAULT, init: SwtCombo.() -> Unit = {}) =
             build(SwtCombo(container, style), init)
 
+    /**
+     * Create a [DateTime] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the DateTime
+     */
     fun dateTime(style: Int = SWT.DEFAULT, init: SwtDateTime.() -> Unit = {}) =
             build(SwtDateTime(container, style), init)
 
+    /**
+     * Create a [Group] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the Group
+     */
     fun group(style: Int = SWT.DEFAULT, init: SwtGroup.() -> Unit = {}) =
             build(SwtGroup(container, style), init)
 
+    /**
+     * Create a [Label] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the Label
+     */
     fun label(style: Int = SWT.DEFAULT, init: SwtLabel.() -> Unit = {}) =
             build(SwtLabel(container, style), init)
 
+    /**
+     * Create a [Link] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the Link
+     */
     fun link(style: Int = SWT.DEFAULT, init: SwtLink.() -> Unit = {}) =
             build(SwtLink(container, style), init)
 
+    /**
+     * Create a [Link] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the Link
+     */
     fun list(style: Int = SWT.DEFAULT, init: SwtList.() -> Unit = {}) =
             build(SwtList(container, style), init)
 
+    /**
+     * Create a [ProgressBar] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the ProgressBar
+     */
     fun progressBar(style: Int = SWT.DEFAULT, init: SwtProgressBar.() -> Unit = {}) =
             build(SwtProgressBar(container, style), init)
 
+    /**
+     * Create a [Sash] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the Sash
+     */
     fun sash(style: Int = SWT.DEFAULT, init: SwtSash.() -> Unit = {}) =
             build(SwtSash(container, style), init)
 
+    /**
+     * Create a [Scale] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the Scale
+     */
     fun scale(style: Int = SWT.DEFAULT, init: SwtScale.() -> Unit = {}) =
             build(SwtScale(container, style), init)
 
+    /**
+     * Create a [Slider] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the Slider
+     */
     fun slider(style: Int = SWT.DEFAULT, init: SwtSlider.() -> Unit = {}) =
             build(SwtSlider(container, style), init)
 
+    /**
+     * Create a [Spinner] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the Spinner
+     */
     fun spinner(style: Int = SWT.DEFAULT, init: SwtSpinner.() -> Unit = {}) =
             build(SwtSpinner(container, style), init)
 
+    /**
+     * Create a [StyledText] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the StyledText
+     */
     fun styledText(style: Int = SWT.DEFAULT, init: SwtStyledText.() -> Unit = {}) =
             build(SwtStyledText(container, style), init)
 
+    /**
+     * Create a [Table] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the Table
+     */
     fun table(style: Int = SWT.DEFAULT, init: SwtTable.() -> Unit = {}) =
             build(SwtTable(container, style), init)
 
+    /**
+     * Create a [TabFolder] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the TabFolder
+     */
     fun tabFolder(style: Int = SWT.DEFAULT, init: SwtTabFolder.() -> Unit = {}) =
             build(SwtTabFolder(container, style), init)
 
+    /**
+     * Create a [Text] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the Text
+     */
     fun text(style: Int = SWT.DEFAULT, init: SwtText.() -> Unit = {}) =
             build(SwtText(container, style), init)
 
+    /**
+     * Create a [ToolBar] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the ToolBar
+     */
     fun toolbar(style: Int = SWT.DEFAULT, init: SwtToolBar.() -> Unit = {}) =
             build(SwtToolBar(container, style), init)
 
+    /**
+     * Create a [Tree] with the given style.
+     *
+     * @param style The style of the Composite
+     * @return the Tree
+     */
     fun tree(style: Int = SWT.DEFAULT, init: SwtTree.() -> Unit = {}) =
             build(SwtTree(container, style), init)
 
@@ -110,8 +230,17 @@ interface SwtContainer {
 class SwtShell(parent: Display, style: Int) : Shell(parent, style), SwtContainer {
     override val container = this
 
-    fun menuBar(style: Int = SWT.LEFT_TO_RIGHT, init: SwtMenu.() -> Unit = {}) =
-            build(SwtMenu(this, SWT.BAR or style), init)
+    /**
+     * Create and set the menu bar of this shell
+     *
+     * @param style The style of the Menu
+     * @return the Menu
+     */
+    fun menuBar(style: Int = SWT.LEFT_TO_RIGHT, init: SwtMenu.() -> Unit = {}): SwtMenu {
+        val menu = build(SwtMenu(this, SWT.BAR or style), init)
+        menuBar = menu
+        return menu
+    }
 
 }
 
@@ -125,14 +254,23 @@ class SwtComposite(parent: Composite, style: Int) : Composite(parent, style), Sw
 @SwtDsl
 class SwtCombo(parent: Composite, style: Int) : Combo(parent, style) {
 
+    /**
+     * Add an item to this Combo
+     */
     fun String.unaryPlus() {
         setItem(itemCount, this)
     }
 
+    /**
+     * Remove an item from this Combo
+     */
     fun String.unaryMinus() {
         remove(this)
     }
 
+    /**
+     * Remove items from this Combo
+     */
     fun IntRange.unaryMinus() {
         remove(this.start, this.endInclusive)
     }
@@ -151,14 +289,23 @@ class SwtGroup(parent: Composite, style: Int) : Group(parent, style), SwtContain
 @SwtDsl
 class SwtList(parent: Composite, style: Int) : List(parent, style) {
 
+    /**
+     * Add an item to this List
+     */
     fun String.unaryPlus() {
         setItem(itemCount, this)
     }
 
+    /**
+     * Remove an item from this List
+     */
     fun String.unaryMinus() {
         remove(this)
     }
 
+    /**
+     * Remove items from this List
+     */
     fun IntRange.unaryMinus() {
         remove(this.start, this.endInclusive)
     }
@@ -174,6 +321,9 @@ class SwtList(parent: Composite, style: Int) : List(parent, style) {
 @SwtDsl
 class SwtText(parent: Composite, style: Int) : Text(parent, style) {
 
+    /**
+     * Append the given text
+     */
     fun String.unaryPlus() {
         append(this)
     }
@@ -183,6 +333,9 @@ class SwtText(parent: Composite, style: Int) : Text(parent, style) {
 @SwtDsl
 class SwtStyledText(parent: Composite, style: Int) : StyledText(parent, style) {
 
+    /**
+     * Append the given text
+     */
     fun String.unaryPlus() {
         append(this)
     }
@@ -197,23 +350,54 @@ class SwtMenu : Menu {
     constructor(parent: Menu) : super(parent)
     constructor(parent: MenuItem) : super(parent)
 
+    /**
+     * Create a menu item with the given style
+     *
+     * @param style The style of the menu item
+     * @return the menu item
+     */
     fun item(style: Int = SWT.DEFAULT, index: Int = itemCount, init: SwtMenuItem.() -> Unit = {}) =
             build(SwtMenuItem(this, style, index), init)
 
+    /**
+     * Create a sub-menu
+     *
+     * @return the menu
+     */
     fun menu(init: SwtMenu.() -> Unit = {}) = build(SwtMenu(this), init)
 }
 
 @SwtDsl
 class SwtMenuItem(parent: Menu, style: Int, index: Int) : MenuItem(parent, style, index) {
+
+    /**
+     * Create a sub-menu
+     *
+     * @return the menu
+     */
     fun menu(init: SwtMenu.() -> Unit = {}) = build(SwtMenu(this), init)
+
 }
 
 @SwtDsl
 class SwtTabFolder(parent: Composite, style: Int) : TabFolder(parent, style) {
 
+    /**
+     * Add a tab with the given style.
+     *
+     * @param style The style of the tab item
+     * @return the tab item
+     */
     fun tab(style: Int = SWT.DEFAULT, init: SwtTabItem.() -> Unit = {}) =
             build(SwtTabItem(this, style), init)
 
+    /**
+     * Add a tab with the given style a the specified index.
+     *
+     * @param style The style of the tab item
+     * @param index The index of the tab item
+     * @return the tab item
+     */
     fun tab(style: Int = SWT.DEFAULT, index: Int, init: SwtTabItem.() -> Unit = {}) =
             build(SwtTabItem(this, style, index), init)
 
@@ -230,15 +414,41 @@ class SwtTabItem : TabItem {
 @SwtDsl
 class SwtTree(parent: Composite, style: Int) : Tree(parent, style) {
 
+    /**
+     * Add a tree item with the given style
+     *
+     * @param style The style of the item
+     * @return the tree item
+     */
     fun item(style: Int = SWT.DEFAULT, init: SwtTreeItem.() -> Unit = {}) =
             build(SwtTreeItem(this, style), init)
 
+    /**
+     * Add a tree item with the given style at the specified index
+     *
+     * @param style The style of the item
+     * @param index The index of the tree item
+     * @return the tree item
+     */
     fun item(style: Int = SWT.DEFAULT, index: Int, init: SwtTreeItem.() -> Unit = {}) =
             build(SwtTreeItem(this, style, index), init)
 
+    /**
+     * Add a tree column with the given style
+     *
+     * @param style The style of the column
+     * @return the tree item
+     */
     fun column(style: Int = SWT.DEFAULT, init: SwtTreeColumn.() -> Unit = {}) =
             build(SwtTreeColumn(this, style), init)
 
+    /**
+     * Add a tree column with the given style at the specified index
+     *
+     * @param style The style of the column
+     * @param index The index of the tree column
+     * @return the tree item
+     */
     fun column(style: Int = SWT.DEFAULT, index: Int, init: SwtTreeColumn.() -> Unit = {}) =
             build(SwtTreeColumn(this, style, index), init)
 
@@ -252,9 +462,22 @@ class SwtTreeItem : TreeItem {
     constructor(parent: TreeItem, style: Int) : super(parent, style)
     constructor(parent: TreeItem, style: Int, index: Int) : super(parent, style, index)
 
+    /**
+     * Add a tree item with the given style
+     *
+     * @param style The style of the item
+     * @return the tree item
+     */
     fun item(style: Int = SWT.DEFAULT, init: SwtTreeItem.() -> Unit = {}) =
             build(SwtTreeItem(this, style), init)
 
+    /**
+     * Add a tree item with the given style at the specified index
+     *
+     * @param style The style of the item
+     * @param index The index of the tree item
+     * @return the tree item
+     */
     fun item(style: Int = SWT.DEFAULT, index: Int, init: SwtTreeItem.() -> Unit = {}) =
             build(SwtTreeItem(this, style, index), init)
 
@@ -271,15 +494,41 @@ class SwtTreeColumn : TreeColumn {
 @SwtDsl
 class SwtTable(parent: Composite, style: Int) : Table(parent, style) {
 
+    /**
+     * Add a column with the given style
+     *
+     * @param style The style of the column
+     * @return the column
+     */
     fun column(style: Int = SWT.DEFAULT, init: SwtTableColumn.() -> Unit = {}) =
             build(SwtTableColumn(this, style), init)
 
+    /**
+     * Add a column with the given style at the specified index
+     *
+     * @param style The style of the column
+     * @param index The index of the column
+     * @return the column
+     */
     fun column(style: Int = SWT.DEFAULT, index: Int, init: SwtTableColumn.() -> Unit = {}) =
             build(SwtTableColumn(this, style, index), init)
 
+    /**
+     * Add an item with the given style at the specified index
+     *
+     * @param style The style of the item
+     * @return the item
+     */
     fun item(style: Int = SWT.DEFAULT, init: SwtTableItem.() -> Unit = {}) =
             build(SwtTableItem(this, style), init)
 
+    /**
+     * Add an item with the given style at the specified index
+     *
+     * @param style The style of the item
+     * @param index The index of the item
+     * @return the item
+     */
     fun item(style: Int = SWT.DEFAULT, index: Int, init: SwtTableItem.() -> Unit = {}) =
             build(SwtTableItem(this, style, index), init)
 }
@@ -303,9 +552,22 @@ class SwtTableItem : TableItem {
 @SwtDsl
 class SwtToolBar(parent: Composite, style: Int) : ToolBar(parent, style) {
 
+    /**
+     * Add an item with the given style
+     *
+     * @param style The style of the item
+     * @return the item
+     */
     fun item(style: Int = SWT.DEFAULT, init: SwtToolItem.() -> Unit = {}) =
             build(SwtToolItem(this, style), init)
 
+    /**
+     * Add an item with the given style at the specified index
+     *
+     * @param style The style of the item
+     * @param index The index of the item
+     * @return the item
+     */
     fun item(style: Int = SWT.DEFAULT, index: Int, init: SwtToolItem.() -> Unit = {}) =
             build(SwtToolItem(this, style, index), init)
 
@@ -314,19 +576,45 @@ class SwtToolBar(parent: Composite, style: Int) : ToolBar(parent, style) {
 @SwtDsl
 class SwtToolItem : ToolItem {
 
-    constructor(parent: ToolBar, style: Int): super(parent, style)
-    constructor(parent: ToolBar, style: Int, index: Int): super(parent, style, index)
+    constructor(parent: ToolBar, style: Int) : super(parent, style)
+    constructor(parent: ToolBar, style: Int, index: Int) : super(parent, style, index)
 
 }
 
+/**
+ * Create a Shell with the given style
+ *
+ * @param display The display, defaults to `Display.getCurrent()`
+ * @param style The style of the shell, default to `SWT.SHELL_TRIM`
+ * @return the shell
+ */
 fun shell(display: Display = Display.getCurrent(), style: Int = SWT.SHELL_TRIM, init: SwtShell.() -> Unit = {}) =
         build(SwtShell(display, style), init)
 
+/**
+ * Create a Composite with the given style
+ *
+ * @param parent The parent Composite
+ * @return the Composite
+ */
 fun composite(parent: Composite, style: Int = SWT.DEFAULT, init: SwtComposite.() -> Unit = {}) =
         build(SwtComposite(parent, style), init)
 
+/**
+ * Create a menu
+ *
+ * @param parent The parent
+ * @param style The style of the menu
+ * @return the menu
+ */
 fun menu(parent: Decorations, style: Int = SWT.DEFAULT, init: SwtMenu.() -> Unit = {}) =
         build(SwtMenu(parent, style), init)
 
+/**
+ * Create a menu
+ *
+ * @param parent The parent control
+ * @return the menu
+ */
 fun menu(parent: Control, init: SwtMenu.() -> Unit = {}) =
         build(SwtMenu(parent), init)
