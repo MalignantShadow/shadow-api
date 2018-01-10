@@ -37,6 +37,18 @@ import org.eclipse.swt.widgets.Tree
 import org.eclipse.swt.widgets.TreeColumn
 import org.eclipse.swt.widgets.TreeItem
 
+/*
+ * Note - Each class that extends an SWT Widget in this file overrides the
+ * checkSubclass method, which would otherwise throw an exception if these classes were used.
+ *
+ * These class do not alter their parent, they are only used to provide a DSL to make it easier
+ * to create views. Some functions are added to the classes, but they simply act as aliases to other
+ * functions of their parent.
+ *
+ * Put simply, the SWT dev team allows the overriding of 'checkSubclass' as long as the implementer
+ * knows what they're doing.
+ */
+
 @DslMarker
 annotation class SwtDsl
 
@@ -51,7 +63,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the Composite
      */
-    fun composite(style: Int = SWT.DEFAULT, init: SwtComposite.() -> Unit = {}) =
+    fun composite(style: Int = SWT.NONE, init: SwtComposite.() -> Unit = {}) =
             build(SwtComposite(container, style), init)
 
     /**
@@ -229,6 +241,7 @@ interface SwtContainer {
 
 class SwtShell(parent: Display, style: Int) : Shell(parent, style), SwtContainer {
     override val container = this
+    override fun checkSubclass() {}
 
     /**
      * Create and set the menu bar of this shell
@@ -246,13 +259,21 @@ class SwtShell(parent: Display, style: Int) : Shell(parent, style), SwtContainer
 
 class SwtComposite(parent: Composite, style: Int) : Composite(parent, style), SwtContainer {
     override val container: Composite = this
+    override fun checkSubclass() {}
 }
 
-@SwtDsl class SwtButton(parent: Composite, style: Int) : Button(parent, style)
-@SwtDsl class SwtCanvas(parent: Composite) : Canvas(parent, SWT.NONE)
+@SwtDsl class SwtButton(parent: Composite, style: Int) : Button(parent, style) {
+    override fun checkSubclass() {}
+}
+
+@SwtDsl class SwtCanvas(parent: Composite) : Canvas(parent, SWT.NONE) {
+    override fun checkSubclass() {}
+}
 
 @SwtDsl
 class SwtCombo(parent: Composite, style: Int) : Combo(parent, style) {
+
+    override fun checkSubclass() {}
 
     /**
      * Add an item to this Combo
@@ -277,17 +298,27 @@ class SwtCombo(parent: Composite, style: Int) : Combo(parent, style) {
 
 }
 
-@SwtDsl class SwtDateTime(parent: Composite, style: Int) : DateTime(parent, style)
+@SwtDsl class SwtDateTime(parent: Composite, style: Int) : DateTime(parent, style) {
+    override fun checkSubclass() {}
+}
 
 class SwtGroup(parent: Composite, style: Int) : Group(parent, style), SwtContainer {
     override val container = this
+    override fun checkSubclass() {}
 }
 
-@SwtDsl class SwtLabel(parent: Composite, style: Int) : Label(parent, style)
-@SwtDsl class SwtLink(parent: Composite, style: Int) : Link(parent, style)
+@SwtDsl class SwtLabel(parent: Composite, style: Int) : Label(parent, style) {
+    override fun checkSubclass() {}
+}
+
+@SwtDsl class SwtLink(parent: Composite, style: Int) : Link(parent, style) {
+    override fun checkSubclass() {}
+}
 
 @SwtDsl
 class SwtList(parent: Composite, style: Int) : List(parent, style) {
+
+    override fun checkSubclass() {}
 
     /**
      * Add an item to this List
@@ -312,14 +343,30 @@ class SwtList(parent: Composite, style: Int) : List(parent, style) {
 
 }
 
-@SwtDsl class SwtProgressBar(parent: Composite, style: Int) : ProgressBar(parent, style)
-@SwtDsl class SwtSash(parent: Composite, style: Int) : Sash(parent, style)
-@SwtDsl class SwtScale(parent: Composite, style: Int) : Scale(parent, style)
-@SwtDsl class SwtSlider(parent: Composite, style: Int) : Slider(parent, style)
-@SwtDsl class SwtSpinner(parent: Composite, style: Int) : Spinner(parent, style)
+@SwtDsl class SwtProgressBar(parent: Composite, style: Int) : ProgressBar(parent, style) {
+    override fun checkSubclass() {}
+}
+
+@SwtDsl class SwtSash(parent: Composite, style: Int) : Sash(parent, style) {
+    override fun checkSubclass() {}
+}
+
+@SwtDsl class SwtScale(parent: Composite, style: Int) : Scale(parent, style) {
+    override fun checkSubclass() {}
+}
+
+@SwtDsl class SwtSlider(parent: Composite, style: Int) : Slider(parent, style) {
+    override fun checkSubclass() {}
+}
+
+@SwtDsl class SwtSpinner(parent: Composite, style: Int) : Spinner(parent, style) {
+    override fun checkSubclass() {}
+}
 
 @SwtDsl
 class SwtText(parent: Composite, style: Int) : Text(parent, style) {
+
+    override fun checkSubclass() {}
 
     /**
      * Append the given text
@@ -332,6 +379,8 @@ class SwtText(parent: Composite, style: Int) : Text(parent, style) {
 
 @SwtDsl
 class SwtStyledText(parent: Composite, style: Int) : StyledText(parent, style) {
+
+    override fun checkSubclass() {}
 
     /**
      * Append the given text
@@ -349,6 +398,8 @@ class SwtMenu : Menu {
     constructor(parent: Decorations, style: Int) : super(parent, style)
     constructor(parent: Menu) : super(parent)
     constructor(parent: MenuItem) : super(parent)
+
+    override fun checkSubclass() {}
 
     /**
      * Create a menu item with the given style
@@ -370,6 +421,8 @@ class SwtMenu : Menu {
 @SwtDsl
 class SwtMenuItem(parent: Menu, style: Int, index: Int) : MenuItem(parent, style, index) {
 
+    override fun checkSubclass() {}
+
     /**
      * Create a sub-menu
      *
@@ -381,6 +434,8 @@ class SwtMenuItem(parent: Menu, style: Int, index: Int) : MenuItem(parent, style
 
 @SwtDsl
 class SwtTabFolder(parent: Composite, style: Int) : TabFolder(parent, style) {
+
+    override fun checkSubclass() {}
 
     /**
      * Add a tab with the given style.
@@ -406,6 +461,8 @@ class SwtTabFolder(parent: Composite, style: Int) : TabFolder(parent, style) {
 @SwtDsl
 class SwtTabItem : TabItem {
 
+    override fun checkSubclass() {}
+
     constructor(parent: TabFolder, style: Int) : super(parent, style)
     constructor(parent: TabFolder, style: Int, index: Int) : super(parent, style, index)
 
@@ -413,6 +470,8 @@ class SwtTabItem : TabItem {
 
 @SwtDsl
 class SwtTree(parent: Composite, style: Int) : Tree(parent, style) {
+
+    override fun checkSubclass() {}
 
     /**
      * Add a tree item with the given style
@@ -457,6 +516,8 @@ class SwtTree(parent: Composite, style: Int) : Tree(parent, style) {
 @SwtDsl
 class SwtTreeItem : TreeItem {
 
+    override fun checkSubclass() {}
+
     constructor(parent: Tree, style: Int) : super(parent, style)
     constructor(parent: Tree, style: Int, index: Int) : super(parent, style, index)
     constructor(parent: TreeItem, style: Int) : super(parent, style)
@@ -486,6 +547,8 @@ class SwtTreeItem : TreeItem {
 @SwtDsl
 class SwtTreeColumn : TreeColumn {
 
+    override fun checkSubclass() {}
+
     constructor(parent: Tree, style: Int) : super(parent, style)
     constructor(parent: Tree, style: Int, index: Int) : super(parent, style, index)
 
@@ -493,6 +556,8 @@ class SwtTreeColumn : TreeColumn {
 
 @SwtDsl
 class SwtTable(parent: Composite, style: Int) : Table(parent, style) {
+
+    override fun checkSubclass() {}
 
     /**
      * Add a column with the given style
@@ -536,6 +601,8 @@ class SwtTable(parent: Composite, style: Int) : Table(parent, style) {
 @SwtDsl
 class SwtTableColumn : TableColumn {
 
+    override fun checkSubclass() {}
+
     constructor(parent: Table, style: Int) : super(parent, style)
     constructor(parent: Table, style: Int, index: Int) : super(parent, style, index)
 
@@ -544,6 +611,8 @@ class SwtTableColumn : TableColumn {
 @SwtDsl
 class SwtTableItem : TableItem {
 
+    override fun checkSubclass() {}
+
     constructor(parent: Table, style: Int) : super(parent, style)
     constructor(parent: Table, style: Int, index: Int) : super(parent, style, index)
 
@@ -551,6 +620,8 @@ class SwtTableItem : TableItem {
 
 @SwtDsl
 class SwtToolBar(parent: Composite, style: Int) : ToolBar(parent, style) {
+
+    override fun checkSubclass() {}
 
     /**
      * Add an item with the given style
@@ -576,6 +647,8 @@ class SwtToolBar(parent: Composite, style: Int) : ToolBar(parent, style) {
 @SwtDsl
 class SwtToolItem : ToolItem {
 
+    override fun checkSubclass() {}
+
     constructor(parent: ToolBar, style: Int) : super(parent, style)
     constructor(parent: ToolBar, style: Int, index: Int) : super(parent, style, index)
 
@@ -597,7 +670,7 @@ fun shell(display: Display = Display.getCurrent(), style: Int = SWT.SHELL_TRIM, 
  * @param parent The parent Composite
  * @return the Composite
  */
-fun composite(parent: Composite, style: Int = SWT.DEFAULT, init: SwtComposite.() -> Unit = {}) =
+fun composite(parent: Composite, style: Int = SWT.NONE, init: SwtComposite.() -> Unit = {}) =
         build(SwtComposite(parent, style), init)
 
 /**
