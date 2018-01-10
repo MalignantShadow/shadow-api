@@ -21,7 +21,7 @@ abstract class MainShell(appName: String, val title: String, style: Int = SWT.SH
     /**
      * The display. Equivalent to `Display.getCurrent()`
      */
-    val display: Display = Display.getCurrent()
+    val display: Display = Display.getDefault()
 
     private var _shell: Shell
 
