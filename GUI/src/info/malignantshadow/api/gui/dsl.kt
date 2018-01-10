@@ -257,8 +257,10 @@ class SwtTreeItem : TreeItem {
 
 @SwtDsl
 class SwtTreeColumn : TreeColumn {
+
     constructor(parent: Tree, style: Int) : super(parent, style)
     constructor(parent: Tree, style: Int, index: Int) : super(parent, style, index)
+
 }
 
 @SwtDsl
@@ -279,14 +281,18 @@ class SwtTable(parent: Composite, style: Int) : Table(parent, style) {
 
 @SwtDsl
 class SwtTableColumn : TableColumn {
+
     constructor(parent: Table, style: Int) : super(parent, style)
     constructor(parent: Table, style: Int, index: Int) : super(parent, style, index)
+
 }
 
 @SwtDsl
 class SwtTableItem : TableItem {
+
     constructor(parent: Table, style: Int) : super(parent, style)
     constructor(parent: Table, style: Int, index: Int) : super(parent, style, index)
+
 }
 
 fun shell(display: Display = Display.getCurrent(), style: Int = SWT.SHELL_TRIM, init: SwtShell.() -> Unit = {}) =
