@@ -2,8 +2,14 @@
 @file:JvmName("Extensions")
 @file:Suppress("unused")
 
-package info.malignantshadow.api.util.extensions
+package info.malignantshadow.api.util
 
+/**
+ * Indicates whether the string is equal to any of the given `tests`
+ *
+ * @param ignoreCase Whether to be case-sensitive
+ * @param tests The test strings
+ */
 fun String?.equalsAny(ignoreCase: Boolean = false, vararg tests: String?): Boolean {
     for (s in tests) {
         if (this == null && s == null)
@@ -17,10 +23,22 @@ fun String?.equalsAny(ignoreCase: Boolean = false, vararg tests: String?): Boole
     return false
 }
 
+/**
+ * Indent a string
+ *
+ * @param indentSize The size of the indent
+ * @param indent The level of indentation
+ * @param indentChar The indentation character
+ */
 @JvmOverloads
 fun String.indent(indentSize: Int = 2, indent: Int = 1, indentChar: Char = ' ') =
         indentChar.toString().repeat(indentSize).repeat(indent) + this
 
+/**
+ * Escape newlines and quoting characters
+ *
+ * @return a new escaped string
+ */
 fun String.escape() =
         if (isEmpty()) this
         else {
@@ -40,6 +58,9 @@ fun String.escape() =
             str
         }
 
+/**
+ * Unescape newlines and quoting characters
+ */
 fun String.unescape(): String {
     return if (isEmpty()) this
     else {
