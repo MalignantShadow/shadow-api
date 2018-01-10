@@ -6,4 +6,5 @@ Most of the module is a DSL for creating SWT views.
 
 ### Example
 If you run the [example code](Example.kt), this is the result: 
+
 ![example window](ExampleWindow.png)
