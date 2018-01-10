@@ -31,6 +31,8 @@ import org.eclipse.swt.widgets.Table
 import org.eclipse.swt.widgets.TableColumn
 import org.eclipse.swt.widgets.TableItem
 import org.eclipse.swt.widgets.Text
+import org.eclipse.swt.widgets.ToolBar
+import org.eclipse.swt.widgets.ToolItem
 import org.eclipse.swt.widgets.Tree
 import org.eclipse.swt.widgets.TreeColumn
 import org.eclipse.swt.widgets.TreeItem
@@ -96,6 +98,9 @@ interface SwtContainer {
 
     fun text(style: Int = SWT.DEFAULT, init: SwtText.() -> Unit = {}) =
             build(SwtText(container, style), init)
+
+    fun toolbar(style: Int = SWT.DEFAULT, init: SwtToolBar.() -> Unit = {}) =
+            build(SwtToolBar(container, style), init)
 
     fun tree(style: Int = SWT.DEFAULT, init: SwtTree.() -> Unit = {}) =
             build(SwtTree(container, style), init)
@@ -292,6 +297,25 @@ class SwtTableItem : TableItem {
 
     constructor(parent: Table, style: Int) : super(parent, style)
     constructor(parent: Table, style: Int, index: Int) : super(parent, style, index)
+
+}
+
+@SwtDsl
+class SwtToolBar(parent: Composite, style: Int) : ToolBar(parent, style) {
+
+    fun item(style: Int = SWT.DEFAULT, init: SwtToolItem.() -> Unit = {}) =
+            build(SwtToolItem(this, style), init)
+
+    fun item(style: Int = SWT.DEFAULT, index: Int, init: SwtToolItem.() -> Unit = {}) =
+            build(SwtToolItem(this, style, index), init)
+
+}
+
+@SwtDsl
+class SwtToolItem : ToolItem {
+
+    constructor(parent: ToolBar, style: Int): super(parent, style)
+    constructor(parent: ToolBar, style: Int, index: Int): super(parent, style, index)
 
 }
 
