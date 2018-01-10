@@ -64,7 +64,7 @@ cases, they add some extension functions helpful to the DSL, but no functions ar
 class itself.
 
 A similar disclaimer can be seen after the import statements in 
-[dsl.kt](src/info/malignantshadow/api/gui/dsl.kt#L41-L50).
+[dsl.kt](src/info/malignantshadow/api/gui/dsl.kt#L40-L50).
 
 ### Example
 If you run the [example code](Example.kt), this is the result: 
