@@ -7,9 +7,9 @@ import info.malignantshadow.api.config.ConfigSection
 import info.malignantshadow.api.config.ConfigSequence
 import info.malignantshadow.api.config.ConfigValue
 import info.malignantshadow.api.config.processor.TextFileConfigProcessor
-import info.malignantshadow.api.util.extensions.escape
-import info.malignantshadow.api.util.extensions.indent
-import info.malignantshadow.api.util.extensions.unescape
+import info.malignantshadow.api.util.escape
+import info.malignantshadow.api.util.indent
+import info.malignantshadow.api.util.unescape
 import info.malignantshadow.api.util.parsing.Tokenizer
 import java.io.FileWriter
 import java.io.IOException
