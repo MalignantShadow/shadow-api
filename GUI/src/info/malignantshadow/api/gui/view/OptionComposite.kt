@@ -82,7 +82,9 @@ class OptionComposite(val parent: Composite, treeWidth: Int) {
                 if (parent == null) TreeItem(_tree, SWT.NONE)
                 else TreeItem(parent, SWT.NONE)
         item.text = title
-        return Item(this, item, Composite(_stacked, SWT.NONE))
+        val it = Item(this, item, Composite(_stacked, SWT.NONE))
+        _items.add(it)
+        return it
     }
 
     data class Item(val parent: OptionComposite, val item: TreeItem, override val container: Composite) : SwtContainer {
