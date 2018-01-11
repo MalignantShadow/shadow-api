@@ -70,3 +70,18 @@ A similar disclaimer can be seen after the import statements in
 If you run the [example code](Example.kt), this is the result: 
 
 ![example window](ExampleWindow.png)
+
+### Adding to the DSL
+Expanding the DSL is as simple as adding the `@SwtDsl` annotation to a class, or implementing
+the `SwtContainer` interface.
+
+Adding a extension functions to the `SwtContainer` interface will also make those functions available
+to any item/class that implements it. This includes (but is not limited to) `Shell`, `Composite`, and `Group`.
+
+An example of `SwtContainer` being implemented for a custom class is an
+[item in a OptionComposite](src/info/malignantshadow/api/gui/view/OptionComposite.kt#L80), which allows
+the addition of new items to the tree as well as manipulating the `Composite` the item is attached
+to.
+
+[Further in the file](src/info/malignantshadow/api/gui/view/OptionComposite.kt#L92), you can also
+see an extension function for `SwtContainer`, allowing an `OptionComposite` to be created in any container.
