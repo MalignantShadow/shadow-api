@@ -9,7 +9,9 @@ import info.malignantshadow.api.gui.formData
 import info.malignantshadow.api.gui.formLayout
 import info.malignantshadow.api.util.build
 import org.eclipse.swt.SWT
+import org.eclipse.swt.custom.ScrolledComposite
 import org.eclipse.swt.custom.StackLayout
+import org.eclipse.swt.layout.FillLayout
 import org.eclipse.swt.layout.FormAttachment
 import org.eclipse.swt.widgets.Composite
 import org.eclipse.swt.widgets.Tree
@@ -22,7 +24,7 @@ class OptionComposite(val parent: Composite, treeWidth: Int, treeStyle: Int = 0)
     private val _treeWidth = treeWidth
     val container: Composite
     private val _stackLayout: StackLayout = StackLayout()
-
+    private lateinit var _scrolled: ScrolledComposite
     private lateinit var _stacked: Composite
     val stacked get() = _stacked
 
@@ -48,14 +50,22 @@ class OptionComposite(val parent: Composite, treeWidth: Int, treeStyle: Int = 0)
                 }
             }
 
-            this@OptionComposite._stacked = composite {
-                layout = this@OptionComposite._stackLayout
+            this@OptionComposite._scrolled = scrolledComposite(SWT.H_SCROLL or SWT.V_SCROLL) {
+                layout = FillLayout()
                 layoutData = formData {
                     top = FormAttachment(0)
                     left = FormAttachment(this@OptionComposite._tree, 0, SWT.RIGHT)
                     bottom = FormAttachment(100)
                     right = FormAttachment(100)
                 }
+
+                this@OptionComposite._stacked = composite {
+                    layout = this@OptionComposite._stackLayout
+                }
+
+                content = this@OptionComposite._stacked
+                expandHorizontal = true
+                expandVertical = true
             }
         }
     }
@@ -67,6 +77,7 @@ class OptionComposite(val parent: Composite, treeWidth: Int, treeStyle: Int = 0)
                 _stackLayout.topControl = it.container
                 _stacked.layout()
                 _selected = item
+                _scrolled.setMinSize(it.container.computeSize(SWT.DEFAULT, SWT.DEFAULT))
                 return@select
             }
         }
