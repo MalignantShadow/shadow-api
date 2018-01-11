@@ -1,7 +1,7 @@
-import info.malignantshadow.api.gui.MainShell
 import info.malignantshadow.api.gui.composite
 import info.malignantshadow.api.gui.formData
 import info.malignantshadow.api.gui.formLayout
+import info.malignantshadow.api.gui.view.MainShell
 import org.eclipse.swt.SWT
 import org.eclipse.swt.graphics.Point
 import org.eclipse.swt.layout.FormAttachment

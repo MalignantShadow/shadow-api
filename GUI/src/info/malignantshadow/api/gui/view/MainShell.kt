@@ -1,7 +1,10 @@
 @file:Suppress("UNUSED")
 
-package info.malignantshadow.api.gui
+package info.malignantshadow.api.gui.view
 
+import info.malignantshadow.api.gui.Resources
+import info.malignantshadow.api.gui.center
+import info.malignantshadow.api.gui.disposeRecursively
 import org.eclipse.swt.SWT
 import org.eclipse.swt.graphics.Point
 import org.eclipse.swt.layout.FillLayout
