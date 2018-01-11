@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.TreeItem
  * Note - Each class that extends an SWT Widget in this file overrides the
  * checkSubclass method, which would otherwise throw an exception if these classes were used.
  *
- * These class do not alter their parent, they are only used to provide a DSL to make it easier
+ * These classes do not alter their parent, they are only used to provide a DSL to make it easier
  * to create views. Some functions are added to the classes, but they simply act as aliases to other
  * functions of their parent.
  *
