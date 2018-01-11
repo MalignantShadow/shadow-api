@@ -4,6 +4,7 @@ package info.malignantshadow.api.gui
 
 import info.malignantshadow.api.util.build
 import org.eclipse.swt.SWT
+import org.eclipse.swt.custom.ScrolledComposite
 import org.eclipse.swt.custom.StyledText
 import org.eclipse.swt.widgets.Button
 import org.eclipse.swt.widgets.Canvas
@@ -78,6 +79,12 @@ interface SwtContainer {
      */
     fun composite(style: Int = SWT.NONE, init: SwtComposite.() -> Unit = {}) =
             composite(container, style, init)
+
+    /**
+     *
+     */
+    fun scrolledComposite(style: Int = SWT.NONE, init: SwtScrolledComposite.() -> Unit = {}) =
+            scrolledComposite(container, style, init)
 
     /**
      * Create a [Button] with the given style.
@@ -683,6 +690,12 @@ fun shell(display: Display = Display.getCurrent(), style: Int = SWT.SHELL_TRIM, 
  */
 fun composite(parent: Composite, style: Int = SWT.NONE, init: SwtComposite.() -> Unit = {}) =
         build(SwtComposite(parent, style), init)
+
+/**
+ *
+ */
+fun scrolledComposite(parent: Composite, style: Int = SWT.NONE, init: SwtScrolledComposite.() -> Unit = {}) =
+        build(SwtScrolledComposite(parent, style), init)
 
 /**
  * Create a menu
