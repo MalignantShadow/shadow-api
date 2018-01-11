@@ -77,7 +77,7 @@ interface SwtContainer {
      * @return the Composite
      */
     fun composite(style: Int = SWT.NONE, init: SwtComposite.() -> Unit = {}) =
-            build(SwtComposite(container, style), init)
+            composite(container, style, init)
 
     /**
      * Create a [Button] with the given style.
