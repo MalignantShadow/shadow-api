@@ -62,6 +62,7 @@ abstract class MainShell(appName: String, val title: String, style: Int = SWT.SH
             size = defaultSize
             center()
             visible = true
+            forceActive()
             while (!_shell.isDisposed) {
                 if (!display.readAndDispatch())
                     display.sleep()
