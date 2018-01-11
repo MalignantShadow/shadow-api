@@ -23,7 +23,7 @@ inline fun formLayout(init: FormLayout.() -> Unit = {}) = build(FormLayout(), in
 inline fun formData(init: FormData.() -> Unit = {}) = build(FormData(), init)
 
 /**
- * Make a [FormData] object
+ * Make a [FormData] object. If a parameter is less than 0, it is ignored.
  *
  * @param top The top numerator
  * @param left The left numerator
@@ -31,10 +31,14 @@ inline fun formData(init: FormData.() -> Unit = {}) = build(FormData(), init)
  * @param right The right numerator
  */
 fun formData(top: Int, left: Int, bottom: Int, right: Int) = formData {
-    this.top = FormAttachment(top)
-    this.left = FormAttachment(left)
-    this.bottom = FormAttachment(bottom)
-    this.right = FormAttachment(right)
+    if (top >= 0)
+        this.top = FormAttachment(top)
+    if (left >= 0)
+        this.left = FormAttachment(left)
+    if (bottom >= 0)
+        this.bottom = FormAttachment(bottom)
+    if (right >= 0)
+        this.right = FormAttachment(right)
 }
 
 /**
