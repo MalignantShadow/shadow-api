@@ -92,7 +92,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the Button
      */
-    fun button(style: Int = SWT.DEFAULT, init: SwtButton.() -> Unit = {}) =
+    fun button(style: Int = SWT.NONE, init: SwtButton.() -> Unit = {}) =
             build(SwtButton(container, style), init)
 
     /**
@@ -101,7 +101,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the Canvas
      */
-    fun canvas(style: Int = SWT.DEFAULT, init: SwtCanvas.() -> Unit = {}) =
+    fun canvas(style: Int = SWT.NONE, init: SwtCanvas.() -> Unit = {}) =
             build(SwtCanvas(container), init)
 
     /**
@@ -110,7 +110,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the Combo
      */
-    fun combo(style: Int = SWT.DEFAULT, init: SwtCombo.() -> Unit = {}) =
+    fun combo(style: Int = SWT.NONE, init: SwtCombo.() -> Unit = {}) =
             build(SwtCombo(container, style), init)
 
     /**
@@ -119,7 +119,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the DateTime
      */
-    fun dateTime(style: Int = SWT.DEFAULT, init: SwtDateTime.() -> Unit = {}) =
+    fun dateTime(style: Int = SWT.NONE, init: SwtDateTime.() -> Unit = {}) =
             build(SwtDateTime(container, style), init)
 
     /**
@@ -128,7 +128,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the Group
      */
-    fun group(style: Int = SWT.DEFAULT, init: SwtGroup.() -> Unit = {}) =
+    fun group(style: Int = SWT.NONE, init: SwtGroup.() -> Unit = {}) =
             build(SwtGroup(container, style), init)
 
     /**
@@ -137,7 +137,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the Label
      */
-    fun label(style: Int = SWT.DEFAULT, init: SwtLabel.() -> Unit = {}) =
+    fun label(style: Int = SWT.NONE, init: SwtLabel.() -> Unit = {}) =
             build(SwtLabel(container, style), init)
 
     /**
@@ -146,7 +146,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the Link
      */
-    fun link(style: Int = SWT.DEFAULT, init: SwtLink.() -> Unit = {}) =
+    fun link(style: Int = SWT.NONE, init: SwtLink.() -> Unit = {}) =
             build(SwtLink(container, style), init)
 
     /**
@@ -155,7 +155,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the Link
      */
-    fun list(style: Int = SWT.DEFAULT, init: SwtList.() -> Unit = {}) =
+    fun list(style: Int = SWT.NONE, init: SwtList.() -> Unit = {}) =
             build(SwtList(container, style), init)
 
     /**
@@ -164,7 +164,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the ProgressBar
      */
-    fun progressBar(style: Int = SWT.DEFAULT, init: SwtProgressBar.() -> Unit = {}) =
+    fun progressBar(style: Int = SWT.NONE, init: SwtProgressBar.() -> Unit = {}) =
             build(SwtProgressBar(container, style), init)
 
     /**
@@ -173,7 +173,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the Sash
      */
-    fun sash(style: Int = SWT.DEFAULT, init: SwtSash.() -> Unit = {}) =
+    fun sash(style: Int = SWT.NONE, init: SwtSash.() -> Unit = {}) =
             build(SwtSash(container, style), init)
 
     /**
@@ -182,7 +182,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the Scale
      */
-    fun scale(style: Int = SWT.DEFAULT, init: SwtScale.() -> Unit = {}) =
+    fun scale(style: Int = SWT.NONE, init: SwtScale.() -> Unit = {}) =
             build(SwtScale(container, style), init)
 
     /**
@@ -191,7 +191,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the Slider
      */
-    fun slider(style: Int = SWT.DEFAULT, init: SwtSlider.() -> Unit = {}) =
+    fun slider(style: Int = SWT.NONE, init: SwtSlider.() -> Unit = {}) =
             build(SwtSlider(container, style), init)
 
     /**
@@ -200,7 +200,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the Spinner
      */
-    fun spinner(style: Int = SWT.DEFAULT, init: SwtSpinner.() -> Unit = {}) =
+    fun spinner(style: Int = SWT.NONE, init: SwtSpinner.() -> Unit = {}) =
             build(SwtSpinner(container, style), init)
 
     /**
@@ -209,7 +209,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the StyledText
      */
-    fun styledText(style: Int = SWT.DEFAULT, init: SwtStyledText.() -> Unit = {}) =
+    fun styledText(style: Int = SWT.NONE, init: SwtStyledText.() -> Unit = {}) =
             build(SwtStyledText(container, style), init)
 
     /**
@@ -218,7 +218,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the Table
      */
-    fun table(style: Int = SWT.DEFAULT, init: SwtTable.() -> Unit = {}) =
+    fun table(style: Int = SWT.NONE, init: SwtTable.() -> Unit = {}) =
             build(SwtTable(container, style), init)
 
     /**
@@ -227,7 +227,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the TabFolder
      */
-    fun tabFolder(style: Int = SWT.DEFAULT, init: SwtTabFolder.() -> Unit = {}) =
+    fun tabFolder(style: Int = SWT.NONE, init: SwtTabFolder.() -> Unit = {}) =
             build(SwtTabFolder(container, style), init)
 
     /**
@@ -236,7 +236,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the Text
      */
-    fun text(style: Int = SWT.DEFAULT, init: SwtText.() -> Unit = {}) =
+    fun text(style: Int = SWT.NONE, init: SwtText.() -> Unit = {}) =
             build(SwtText(container, style), init)
 
     /**
@@ -245,7 +245,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the ToolBar
      */
-    fun toolbar(style: Int = SWT.DEFAULT, init: SwtToolBar.() -> Unit = {}) =
+    fun toolbar(style: Int = SWT.NONE, init: SwtToolBar.() -> Unit = {}) =
             build(SwtToolBar(container, style), init)
 
     /**
@@ -254,7 +254,7 @@ interface SwtContainer {
      * @param style The style of the Composite
      * @return the Tree
      */
-    fun tree(style: Int = SWT.DEFAULT, init: SwtTree.() -> Unit = {}) =
+    fun tree(style: Int = SWT.NONE, init: SwtTree.() -> Unit = {}) =
             build(SwtTree(container, style), init)
 
 }
@@ -278,6 +278,11 @@ class SwtShell(parent: Display, style: Int) : Shell(parent, style), SwtContainer
 }
 
 class SwtComposite(parent: Composite, style: Int) : Composite(parent, style), SwtContainer {
+    override val container: Composite = this
+    override fun checkSubclass() {}
+}
+
+class SwtScrolledComposite(parent: Composite, style: Int) : ScrolledComposite(parent, style), SwtContainer {
     override val container: Composite = this
     override fun checkSubclass() {}
 }
@@ -463,7 +468,7 @@ class SwtTabFolder(parent: Composite, style: Int) : TabFolder(parent, style) {
      * @param style The style of the tab item
      * @return the tab item
      */
-    fun tab(style: Int = SWT.DEFAULT, init: SwtTabItem.() -> Unit = {}) =
+    fun tab(style: Int = SWT.NONE, init: SwtTabItem.() -> Unit = {}) =
             build(SwtTabItem(this, style), init)
 
     /**
@@ -473,7 +478,7 @@ class SwtTabFolder(parent: Composite, style: Int) : TabFolder(parent, style) {
      * @param index The index of the tab item
      * @return the tab item
      */
-    fun tab(style: Int = SWT.DEFAULT, index: Int, init: SwtTabItem.() -> Unit = {}) =
+    fun tab(style: Int = SWT.NONE, index: Int, init: SwtTabItem.() -> Unit = {}) =
             build(SwtTabItem(this, style, index), init)
 
 }
@@ -516,7 +521,7 @@ class SwtTree(parent: Composite, style: Int) : Tree(parent, style) {
      * @param style The style of the column
      * @return the tree item
      */
-    fun column(style: Int = SWT.DEFAULT, init: SwtTreeColumn.() -> Unit = {}) =
+    fun column(style: Int = SWT.NONE, init: SwtTreeColumn.() -> Unit = {}) =
             build(SwtTreeColumn(this, style), init)
 
     /**
@@ -526,7 +531,7 @@ class SwtTree(parent: Composite, style: Int) : Tree(parent, style) {
      * @param index The index of the tree column
      * @return the tree item
      */
-    fun column(style: Int = SWT.DEFAULT, index: Int, init: SwtTreeColumn.() -> Unit = {}) =
+    fun column(style: Int = SWT.NONE, index: Int, init: SwtTreeColumn.() -> Unit = {}) =
             build(SwtTreeColumn(this, style, index), init)
 
 }
@@ -547,7 +552,7 @@ class SwtTreeItem : TreeItem {
      * @param style The style of the item
      * @return the tree item
      */
-    fun item(style: Int = SWT.DEFAULT, init: SwtTreeItem.() -> Unit = {}) =
+    fun item(style: Int = SWT.NONE, init: SwtTreeItem.() -> Unit = {}) =
             build(SwtTreeItem(this, style), init)
 
     /**
@@ -557,7 +562,7 @@ class SwtTreeItem : TreeItem {
      * @param index The index of the tree item
      * @return the tree item
      */
-    fun item(style: Int = SWT.DEFAULT, index: Int, init: SwtTreeItem.() -> Unit = {}) =
+    fun item(style: Int = SWT.NONE, index: Int, init: SwtTreeItem.() -> Unit = {}) =
             build(SwtTreeItem(this, style, index), init)
 
 }
@@ -583,7 +588,7 @@ class SwtTable(parent: Composite, style: Int) : Table(parent, style) {
      * @param style The style of the column
      * @return the column
      */
-    fun column(style: Int = SWT.DEFAULT, init: SwtTableColumn.() -> Unit = {}) =
+    fun column(style: Int = SWT.NONE, init: SwtTableColumn.() -> Unit = {}) =
             build(SwtTableColumn(this, style), init)
 
     /**
@@ -593,7 +598,7 @@ class SwtTable(parent: Composite, style: Int) : Table(parent, style) {
      * @param index The index of the column
      * @return the column
      */
-    fun column(style: Int = SWT.DEFAULT, index: Int, init: SwtTableColumn.() -> Unit = {}) =
+    fun column(style: Int = SWT.NONE, index: Int, init: SwtTableColumn.() -> Unit = {}) =
             build(SwtTableColumn(this, style, index), init)
 
     /**
@@ -602,7 +607,7 @@ class SwtTable(parent: Composite, style: Int) : Table(parent, style) {
      * @param style The style of the item
      * @return the item
      */
-    fun item(style: Int = SWT.DEFAULT, init: SwtTableItem.() -> Unit = {}) =
+    fun item(style: Int = SWT.NONE, init: SwtTableItem.() -> Unit = {}) =
             build(SwtTableItem(this, style), init)
 
     /**
@@ -612,7 +617,7 @@ class SwtTable(parent: Composite, style: Int) : Table(parent, style) {
      * @param index The index of the item
      * @return the item
      */
-    fun item(style: Int = SWT.DEFAULT, index: Int, init: SwtTableItem.() -> Unit = {}) =
+    fun item(style: Int = SWT.NONE, index: Int, init: SwtTableItem.() -> Unit = {}) =
             build(SwtTableItem(this, style, index), init)
 }
 
@@ -647,7 +652,7 @@ class SwtToolBar(parent: Composite, style: Int) : ToolBar(parent, style) {
      * @param style The style of the item
      * @return the item
      */
-    fun item(style: Int = SWT.DEFAULT, init: SwtToolItem.() -> Unit = {}) =
+    fun item(style: Int = SWT.NONE, init: SwtToolItem.() -> Unit = {}) =
             build(SwtToolItem(this, style), init)
 
     /**
@@ -657,7 +662,7 @@ class SwtToolBar(parent: Composite, style: Int) : ToolBar(parent, style) {
      * @param index The index of the item
      * @return the item
      */
-    fun item(style: Int = SWT.DEFAULT, index: Int, init: SwtToolItem.() -> Unit = {}) =
+    fun item(style: Int = SWT.NONE, index: Int, init: SwtToolItem.() -> Unit = {}) =
             build(SwtToolItem(this, style, index), init)
 
 }
@@ -704,7 +709,7 @@ fun scrolledComposite(parent: Composite, style: Int = SWT.NONE, init: SwtScrolle
  * @param style The style of the menu
  * @return the menu
  */
-fun menu(parent: Decorations, style: Int = SWT.DEFAULT, init: SwtMenu.() -> Unit = {}) =
+fun menu(parent: Decorations, style: Int = SWT.NONE, init: SwtMenu.() -> Unit = {}) =
         build(SwtMenu(parent, style), init)
 
 /**
