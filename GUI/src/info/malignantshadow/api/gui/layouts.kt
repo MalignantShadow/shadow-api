@@ -4,6 +4,7 @@ package info.malignantshadow.api.gui
 
 import info.malignantshadow.api.util.build
 import org.eclipse.swt.layout.FillLayout
+import org.eclipse.swt.layout.FormAttachment
 import org.eclipse.swt.layout.FormData
 import org.eclipse.swt.layout.FormLayout
 import org.eclipse.swt.layout.GridData
@@ -20,6 +21,21 @@ inline fun formLayout(init: FormLayout.() -> Unit = {}) = build(FormLayout(), in
  * Make a [FormData] object
  */
 inline fun formData(init: FormData.() -> Unit = {}) = build(FormData(), init)
+
+/**
+ * Make a [FormData] object
+ *
+ * @param top The top numerator
+ * @param left The left numerator
+ * @param bottom The bottom numerator
+ * @param right The right numerator
+ */
+fun formData(top: Int, left: Int, bottom: Int, right: Int) = formData {
+    this.top = FormAttachment(top)
+    this.left = FormAttachment(left)
+    this.bottom = FormAttachment(bottom)
+    this.right = FormAttachment(right)
+}
 
 /**
  * Make a [RowLayout]
