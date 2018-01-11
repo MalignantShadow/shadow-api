@@ -6,7 +6,7 @@ import org.eclipse.swt.SWT
 import org.eclipse.swt.graphics.Point
 import org.eclipse.swt.layout.FormAttachment
 
-class ExampleShell : MainShell("example", "Example Shell") {
+class DslExample : MainShell("example", "Example Shell") {
 
     override val defaultSize = Point(500, 300)
 
@@ -41,5 +41,5 @@ class ExampleShell : MainShell("example", "Example Shell") {
 }
 
 fun main(args: Array<String>) {
-    ExampleShell().start()
+    DslExample().start()
 }

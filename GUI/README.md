@@ -69,7 +69,7 @@ A similar disclaimer can be seen after the import statements in
 ### Example
 If you run the [example code](src/info/malignantshadow/api/gui/examples/DslExample.kt), this is the result: 
 
-![example window](ExampleWindow.png)
+![example window](src/info/malignantshadow/api/gui/examples/img/DslExampleWindow.png)
 
 ### Adding to the DSL
 Expanding the DSL is as simple as adding the `@SwtDsl` annotation to a class, or implementing
