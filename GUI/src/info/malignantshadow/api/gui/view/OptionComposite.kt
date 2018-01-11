@@ -96,4 +96,7 @@ class OptionComposite(val parent: Composite, treeWidth: Int) {
 }
 
 fun SwtContainer.optionComposite(treeWidth: Int, init: OptionComposite.() -> Unit) =
-        build(OptionComposite(container, treeWidth), init)
+        optionComposite(container, treeWidth, init)
+
+fun optionComposite(parent: Composite, treeWidth: Int, init: OptionComposite.() -> Unit) =
+        build(OptionComposite(parent, treeWidth), init)
