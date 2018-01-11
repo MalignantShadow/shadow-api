@@ -64,7 +64,7 @@ class OptionComposite(val parent: Composite, treeWidth: Int) {
         _items.forEach {
             if (it.item === item) {
                 _tree.setSelection(item)
-                _stackLayout.topControl = it.comp
+                _stackLayout.topControl = it.container
                 _stacked.layout()
                 _selected = item
                 return@select
