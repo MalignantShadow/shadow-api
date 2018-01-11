@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.TreeItem
 
 @Suppress("CanBeParameter")
 @SwtDsl
-class OptionComposite(val parent: Composite, treeWidth: Int) {
+class OptionComposite(val parent: Composite, treeWidth: Int, treeStyle: Int = 0) {
 
     private val _treeWidth = treeWidth
     val container: Composite
@@ -40,7 +40,7 @@ class OptionComposite(val parent: Composite, treeWidth: Int) {
                 marginHeight = 5
             }
 
-            this@OptionComposite._tree = tree(SWT.BORDER or SWT.H_SCROLL or SWT.V_SCROLL) {
+            this@OptionComposite._tree = tree(SWT.BORDER or SWT.H_SCROLL or SWT.V_SCROLL or treeStyle) {
                 layoutData = formData(0, 0, 100, this@OptionComposite._treeWidth)
                 addListener(SWT.Selection) {
                     if ((it.item as TreeItem) != this@OptionComposite._selected)
@@ -102,8 +102,8 @@ class OptionComposite(val parent: Composite, treeWidth: Int) {
 
 }
 
-fun SwtContainer.optionComposite(treeWidth: Int, init: OptionComposite.() -> Unit) =
-        optionComposite(container, treeWidth, init)
+fun SwtContainer.optionComposite(treeWidth: Int, treeStyle: Int = 0, init: OptionComposite.() -> Unit) =
+        optionComposite(container, treeWidth, treeStyle, init)
 
-fun optionComposite(parent: Composite, treeWidth: Int, init: OptionComposite.() -> Unit) =
-        build(OptionComposite(parent, treeWidth), init)
+fun optionComposite(parent: Composite, treeWidth: Int, treeStyle: Int = 0, init: OptionComposite.() -> Unit) =
+        build(OptionComposite(parent, treeWidth, treeStyle), init)
