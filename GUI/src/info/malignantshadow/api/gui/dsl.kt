@@ -49,12 +49,25 @@ import org.eclipse.swt.widgets.TreeItem
  * knows what they're doing.
  */
 
+/**
+ * The DSL marker. Add this annotation to a class to expand the SWT DSL.
+ */
 @DslMarker
+@Target(AnnotationTarget.CLASS)
 annotation class SwtDsl
 
+/**
+ * Represents a container object, one that can act as a parent for widgets and controls.
+ *
+ * Examples: Composite (via [composite], [SwtContainer.composite]), Shell (via [shell]]),
+ * Group (via [group]).
+ */
 @SwtDsl
 interface SwtContainer {
 
+    /**
+     * The Composite that widgets/controls will be added to.
+     */
     val container: Composite
 
     /**
