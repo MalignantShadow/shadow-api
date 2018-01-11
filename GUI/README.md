@@ -67,7 +67,7 @@ A similar disclaimer can be seen after the import statements in
 [dsl.kt](src/info/malignantshadow/api/gui/dsl.kt#L40-L50).
 
 ### Example
-If you run the [example code](Example.kt), this is the result: 
+If you run the [example code](src/info/malignantshadow/api/gui/examples/DslExample.kt), this is the result: 
 
 ![example window](ExampleWindow.png)
 
