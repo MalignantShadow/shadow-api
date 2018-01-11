@@ -62,7 +62,7 @@ class OptionComposite(val parent: Composite, treeWidth: Int) {
 
     fun select(item: TreeItem) {
         _items.forEach {
-            if(it.item === item) {
+            if (it.item === item) {
                 _tree.setSelection(item)
                 _stackLayout.topControl = it.comp
                 _stacked.layout()
@@ -79,7 +79,7 @@ class OptionComposite(val parent: Composite, treeWidth: Int) {
 
     fun addItem(parent: TreeItem? = null, title: String): Item {
         val item =
-                if(parent == null) TreeItem(_tree, SWT.NONE)
+                if (parent == null) TreeItem(_tree, SWT.NONE)
                 else TreeItem(parent, SWT.NONE)
         item.text = title
         return Item(this, item, Composite(_stacked, SWT.NONE))
@@ -89,7 +89,7 @@ class OptionComposite(val parent: Composite, treeWidth: Int) {
 
         val isRoot = item.parentItem == null
 
-        fun item(title: String, init: Item.() -> Unit= {}) =
+        fun item(title: String, init: Item.() -> Unit = {}) =
                 build(parent.addItem(item, title), init)
     }
 
