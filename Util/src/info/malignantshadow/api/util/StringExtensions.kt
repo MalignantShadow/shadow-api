@@ -24,6 +24,13 @@ fun String?.equalsAny(ignoreCase: Boolean = false, vararg tests: String?): Boole
 }
 
 /**
+ * Shortcut for String.repeat(n)
+ *
+ * @param n The amount of times to repeat the String
+ */
+operator fun String.times(n: Int) = this.repeat(n)
+
+/**
  * Indent a string
  *
  * @param indentSize The size of the indent
