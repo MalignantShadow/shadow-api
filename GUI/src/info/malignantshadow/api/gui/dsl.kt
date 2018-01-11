@@ -476,21 +476,19 @@ class SwtTree(parent: Composite, style: Int) : Tree(parent, style) {
     /**
      * Add a tree item with the given style
      *
-     * @param style The style of the item
      * @return the tree item
      */
-    fun item(style: Int = SWT.DEFAULT, init: SwtTreeItem.() -> Unit = {}) =
-            build(SwtTreeItem(this, style), init)
+    fun item(init: SwtTreeItem.() -> Unit = {}) =
+            build(SwtTreeItem(this, SWT.NONE), init)
 
     /**
      * Add a tree item with the given style at the specified index
      *
-     * @param style The style of the item
      * @param index The index of the tree item
      * @return the tree item
      */
-    fun item(style: Int = SWT.DEFAULT, index: Int, init: SwtTreeItem.() -> Unit = {}) =
-            build(SwtTreeItem(this, style, index), init)
+    fun item(index: Int, init: SwtTreeItem.() -> Unit = {}) =
+            build(SwtTreeItem(this, SWT.NONE, index), init)
 
     /**
      * Add a tree column with the given style
