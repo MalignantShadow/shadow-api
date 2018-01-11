@@ -74,7 +74,7 @@ class OptionComposite(val parent: Composite, treeWidth: Int, treeStyle: Int = 0)
 
     fun select(index: Int) {
         val treeItem = _items.getOrNull(index)?.item
-        if(treeItem != null) select(treeItem)
+        if (treeItem != null) select(treeItem)
     }
 
     fun item(title: String, init: Item.() -> Unit = {}) = item(null, title, init)
