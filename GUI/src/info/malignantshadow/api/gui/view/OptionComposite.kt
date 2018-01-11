@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package info.malignantshadow.api.gui.view
 
 import info.malignantshadow.api.gui.SwtContainer
@@ -13,19 +15,25 @@ import org.eclipse.swt.widgets.Composite
 import org.eclipse.swt.widgets.Tree
 import org.eclipse.swt.widgets.TreeItem
 
+@Suppress("CanBeParameter")
 @SwtDsl
 class OptionComposite(val parent: Composite, treeWidth: Int) {
 
     private val _treeWidth = treeWidth
-    private val _container: Composite
-    private lateinit var _stacked: Composite
+    val container: Composite
     private val _stackLayout: StackLayout = StackLayout()
+
+    private lateinit var _stacked: Composite
+    val stacked get() = _stacked
+
     private lateinit var _tree: Tree
+    val tree get() = _tree
+
     private val _items = ArrayList<Item>()
     private var _selected: TreeItem? = null
 
     init {
-        _container = composite(parent) {
+        container = composite(parent) {
             layout = formLayout {
                 spacing = 5
                 marginWidth = 5
