@@ -1,9 +1,12 @@
 package info.malignantshadow.api.config
 
+import info.malignantshadow.api.util.build
+
 /**
  * Represents a object that holds a list of key/value pairs, where no key can occur twice.
  * @author Shad0w (Caleb Downs)
  */
+@ConfigDsl
 class ConfigSection : ConfigChild(), Iterable<ConfigPair>, ConfigCopyable {
 
     @Suppress("ArrayInDataClass")
@@ -300,6 +303,18 @@ class ConfigSection : ConfigChild(), Iterable<ConfigPair>, ConfigCopyable {
 
         pairs.forEach { if (it != other[it.key]) return@equals false }
         return true
+    }
+
+    fun section(key: String, init: ConfigSection.() -> Unit) {
+        get(true, key)!!.value = build(ConfigSection(), init)
+    }
+
+    fun sequence(key: String, init: ConfigSequence.() -> Unit) {
+        get(true, key)!!.value = build(ConfigSequence(), init)
+    }
+
+    fun value(key: String, lazyValue: () -> Any?) {
+        get(true, key)!!.value = lazyValue()
     }
 
     override fun copy(): ConfigSection {

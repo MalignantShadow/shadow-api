@@ -1,5 +1,8 @@
 package info.malignantshadow.api.config
 
+import info.malignantshadow.api.util.build
+
+@ConfigDsl
 open class ConfigSequence : ConfigChild(), Iterable<Any?>, ConfigCopyable {
 
     private val _seq = ArrayList<Any?>()
@@ -198,6 +201,12 @@ open class ConfigSequence : ConfigChild(), Iterable<Any?>, ConfigCopyable {
         _seq.forEachIndexed { index, it -> if (it != other[index]) return@equals false }
         return true
     }
+
+    fun section(init: ConfigSection.() -> Unit) = add(build(ConfigSection(), init))
+
+    fun sequence(init: ConfigSequence.() -> Unit) = add(build(ConfigSequence(), init))
+
+    fun value(lazyValue: () -> Any?) = add(lazyValue())
 
     override fun copy(): ConfigSequence {
         val seq = ConfigSequence()

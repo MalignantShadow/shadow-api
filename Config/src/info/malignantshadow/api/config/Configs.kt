@@ -3,7 +3,11 @@ package info.malignantshadow.api.config
 import info.malignantshadow.api.config.processor.types.JsonConfigProcessor
 import info.malignantshadow.api.config.processor.types.ShadeConfigProcessor
 import info.malignantshadow.api.config.processor.types.YamlConfigProcessor
+import info.malignantshadow.api.util.build
 import org.yaml.snakeyaml.DumperOptions
+
+@DslMarker
+annotation class ConfigDsl
 
 /**
  * Helper object for Configurations
@@ -54,3 +58,7 @@ object Configs {
     fun shade() = ShadeConfigProcessor()
 
 }
+
+fun section(init: ConfigSection.() -> Unit) = build(ConfigSection(), init)
+
+fun sequence(init: ConfigSequence.() -> Unit) = build(ConfigSequence(), init)
