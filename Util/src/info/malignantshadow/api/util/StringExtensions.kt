@@ -77,12 +77,20 @@ fun String.unescape(): String {
             val c = this[index++]
             when (c) {
                 '\\' -> {
-                    when (this[index++]) {
+                    when (this.getOrNull(index++)) {
+                        null -> str += "\\"
                         'r' -> str += "\r"
                         'n' -> str += "\n"
                         't' -> str += "\t"
                         'b' -> str += "\b"
-                        '\\' -> str += "\\"
+                        'u' ->
+                            if (this.length - index >= 4) {
+                                str += this.substring(index, index + 4).toUpperCase().toInt(16).toChar()
+                                index += 4
+                            } else {
+                                str += "\\u"
+                            }
+                        '\\' -> str += "\\\\"
                         '\'' -> str += "'"
                         '"' -> str += "\""
                     }
