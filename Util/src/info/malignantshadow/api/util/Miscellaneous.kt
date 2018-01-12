@@ -35,3 +35,5 @@ inline fun <T> build(receiver: T, init: T.() -> Unit): T {
 }
 
 inline fun ifPlatform(platforms: Int, block: () -> Unit) = if (currentPlatform in platforms) block() else Unit
+
+fun Any?.equalsAny(vararg tests: Any?) = tests.indexOfFirst { it == this } >= 0
