@@ -34,6 +34,12 @@ inline fun <T> build(receiver: T, init: T.() -> Unit): T {
     return receiver
 }
 
+fun <T> MutableList<T>.build(receiver: T, init: T.() -> Unit): T {
+    receiver.init()
+    add(receiver)
+    return receiver
+}
+
 inline fun ifPlatform(platforms: Int, block: () -> Unit) = if (currentPlatform in platforms) block() else Unit
 
 fun Any?.equalsAny(vararg tests: Any?) = tests.indexOfFirst { it == this } >= 0
