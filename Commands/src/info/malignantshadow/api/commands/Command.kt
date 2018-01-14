@@ -1,52 +1,89 @@
 package info.malignantshadow.api.commands
 
-import info.malignantshadow.api.util.aliases.Aliasable
-import info.malignantshadow.api.util.arguments.Argument
-import info.malignantshadow.api.util.arguments.ArgumentHolder
-import info.malignantshadow.api.util.arguments.ArgumentList
-import info.malignantshadow.api.util.arguments.ParsedArguments
+import info.malignantshadow.api.util.build
 
-open class Command(
-        override val name: String,
-        val desc: String = "",
-        override val aliases: List<String> = emptyList()
-) : Aliasable, ArgumentHolder {
+@CommandDsl
+abstract class Command<C: Command<C, S>, S: CommandSender>(val name: String, val desc: String) {
 
-    var arguments: ArgumentList = ArgumentList()
-    var handler: ((CommandContext) -> Unit)? = {}
-    var hidden: Boolean = false
-    var subCommands: CommandManager? = null
-    val isParent get() = subCommands?.commands?.isEmpty()?.not() ?: false
+    private val _aliases = ArrayList<String>()
+    private val _args = ArrayList<CommandArgument>()
+    private var _extraArg: CommandArgument? = null
 
-    val allAliases: List<String> get() = listOf(name, *aliases.toTypedArray())
+    var handler: ((CommandContext<C, S>) -> Unit)? = null
+    var isHidden = false
 
-    constructor(name: String, desc: String = "", aliases: List<String> = emptyList(), init: Command.() -> Unit) : this(name, desc, aliases) {
-        this.init()
+    abstract val commands: CommandManager<C, S>
+    val aliases = _aliases.toList()
+    val allAliases get() = listOf(name, *aliases.toTypedArray())
+    val args get() = _args
+    val extraArg get() =_extraArg
+    val minArgs get() = args.count { it.isRequired }
+    val maxArgs get() = args.size
+    val argRange get() = minArgs..maxArgs
+    val isParent get() = !commands.isEmpty()
+
+    fun command(name: String, desc: String, init: Command<C, S>.() -> Unit): Command<C, S> = commands.command(name, desc, init)
+
+    fun alias(lazyValue: () -> String) { alias(lazyValue()) }
+    fun alias(alias: String) {
+        if(alias !in _aliases) _aliases.add(alias)
     }
 
-    override fun withArgs(args: Iterable<Argument>): Command {
-        arguments.withArgs(args)
-        return this
+    fun aliases(lazyValue: () -> Iterable<String>) { aliases(lazyValue()) }
+    fun aliases(aliases: Iterable<String>) {
+        _aliases.clear()
+        aliases.forEach { alias(it) }
     }
 
-    override fun withArg(arg: Argument): Command {
-        arguments.withArg(arg)
-        return this
+    fun arg(name: String, desc: String, required: Boolean = false, init: CommandArgument.() -> Unit) =
+            _args.build(CommandArgument(name, desc, required), init)
+
+    fun extra(name: String, desc: String, required: Boolean = false) {
+        _extraArg = CommandArgument(name, desc, required)
     }
 
-    fun withArg(name: String, desc: String?, required: Boolean = false, display: String = "", init: Argument.() -> Unit = {}): Command {
-        val arg = Argument(name, desc, required, display)
-        arg.init()
-        return this
+    fun hasAlias(alias: String) = alias == name || alias in _aliases
+
+    fun conflictsWith(other: Command<*, *>): Boolean {
+        if(hasAlias(other.name)) return true
+        other.aliases.forEach { if(hasAlias(it)) return@conflictsWith true }
+        return false
     }
 
-    fun createContext(sender: CommandSender, prefix: String, args: List<String> = listOf()): CommandContext? {
-        if(arguments.argsList.size < arguments.min) return null
-        return CommandContext(prefix, sender, this, ParsedArguments(arguments, args))
+    fun getParts(sender: S, parts: List<String>): List<Command.Part>? {
+        val given = parts.size
+        if(given < minArgs) {
+            sender.print("Not enough arguments given: expected %d, but received %d", minArgs, given)
+            return null
+        }
+
+        var optionalLeft = given - minArgs
+        var index = 0
+        val commandParts = ArrayList<Command.Part>()
+        args.forEach {
+            when {
+                it.isRequired -> commandParts.add(Command.Part(it, parts[index++]))
+                optionalLeft > 0 -> {
+                    optionalLeft--
+                    commandParts.add(Command.Part(it, parts[index++]))
+                }
+            }
+        }
+
+        if(optionalLeft > 0) {
+            (index until parts.size).mapTo(commandParts) { Command.Part(_extraArg, parts[it], true) }
+        }
+
+        return commandParts
     }
 
-    operator fun contains(alias: String) = alias == name || name in aliases
+    abstract fun createContext(prefix: String, parts: List<Command.Part>): CommandContext<C, S>
 
-    data class Info(val full: String, val cmd: Command, val args: List<String>)
+    class Part(val arg: CommandArgument?, val input: String, isExtra: Boolean = false) {
+
+        val value by lazy { arg?.getValueFrom(input) }
+        val isExtra = isExtra || arg == null
+
+    }
 
 }

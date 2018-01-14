@@ -1,164 +1,135 @@
 package info.malignantshadow.api.commands
 
-import info.malignantshadow.api.util.arguments.Argument
-import info.malignantshadow.api.util.arguments.ArgumentTypes
+import info.malignantshadow.api.util.build
+import info.malignantshadow.api.util.parsing.Tokenizer
 
-open class CommandManager(val commands: ArrayList<Command> = arrayListOf()) {
+@CommandDsl
+abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
 
-    constructor(commands: ArrayList<Command> = arrayListOf(), init: CommandManager.() -> Unit) : this(commands) {
-        this.init()
+    private val _commands = ArrayList<C>()
+    protected abstract fun createCommand(name: String, desc: String): C
+
+    val commands get() = _commands.toList()
+    val size = _commands.size
+
+    fun isEmpty() = _commands.isEmpty()
+
+    fun command(name: String, desc: String, init: C.() -> Unit): C {
+        val cmd = build(createCommand(name, desc), init)
+        add(cmd)
+        return cmd
     }
 
-    operator fun contains(alias: String) = get(alias) != null
-
-    operator fun get(alias: String): Command? = commands.firstOrNull { alias in it }
-
-    open fun push(cmd: Command): CommandManager {
-        cmd.aliases.forEach { require(it !in this) { "A command with the name of $it already exists" } }
-        commands.add(cmd)
-        return this
-    }
-
-    operator fun plusAssign(cmd: Command) {
-        push(cmd)
-    }
-
-    fun getCommandInfo(fullCommand: String) = getCommandInfo(fullCommand.split("\\s+"))
-    fun getCommandInfo(args: List<String>): Command.Info? {
-        if (args.isEmpty()) return null
-
-        val command = args[0]
-        return getCommandInfo(command, args.slice(1..args.lastIndex))
-    }
-
-    fun getCommandInfo(command: String, args: List<String>): Command.Info? {
-        var cmd = get(command) ?: return null
-
-        var nested = cmd.subCommands
-        var fullPath = command
-        var contextArgs = args
-        for (i in 0..args.lastIndex) {
-            if (nested == null) break
-            val label = contextArgs[0]
-            val tmpCmd = nested[label] ?: break
-            cmd = tmpCmd
-            fullPath += " $label"
-            contextArgs = contextArgs.slice(1..contextArgs.lastIndex)
-            nested = cmd.subCommands
-        }
-
-        return Command.Info(fullPath, cmd, contextArgs)
-    }
-
-    fun dispatch(sender: CommandSender, fullCommand: String) = dispatch(sender, fullCommand.split("\\s+"))
-    fun dispatch(sender: CommandSender, args: List<String>): Boolean {
-        val command = args.getOrNull(0) ?: return false
-        return dispatch(sender, command, args.slice(1..args.lastIndex))
-    }
-
-    fun dispatch(sender: CommandSender, command: String, args: List<String>): Boolean {
-        val info = getCommandInfo(command, args)
-        if (info == null) {
-            sender.printErr("[CommandErr] <%s> - Not found", command)
-            return false
-        }
-
-        return dispatch(sender, info.cmd, info.full, info.args)
-    }
-
-    fun dispatch(sender: CommandSender, cmd: Command, prefix: String, args: List<String>): Boolean {
-        val context = createContext(sender, cmd, prefix, args)
-        // contextWasCreated?
-        if (context == null) {
-            sender.printErr("[CommandErr] '%s' - Expected at least %d argument(s), but got %d", prefix, cmd.arguments.min, args.size)
-            return false
-        }
-
-        context.parsedArgs.forEach {
-            val arg = it.arg
-            if (arg.required && !arg.canBeNull && it.value == null) {
-                sender.printErr("[CommandErr] '%s' - Invalid input for argument '%s': \"%s\"", prefix, arg.display, it.input)
-                return@dispatch false
-            }
-        }
-
-        if (commandWillDispatch(cmd, context)) {
-            try {
-                if (!context.dispatchSelf()) return false
-            } catch (e: Exception) {
-                e.printStackTrace()
-
-                context.sender?.printErr("An error occurred while running this command")
-                return false
-            }
-
-            commandDidDispatch(cmd, context)
-            return true
-        }
-        return false
-    }
-
-    fun createContext(sender: CommandSender, command: String, args: List<String>): CommandContext? {
-        return createContext(sender, get(command) ?: return null, command, args)
-    }
-
-    open fun createContext(sender: CommandSender, cmd: Command, prefix: String, args: List<String>) =
-            cmd.createContext(sender, prefix, args)
-
-    fun withHelpCommand(name: String = "help", aliases: List<String> = emptyList()): CommandManager {
-        return push(Command(name, "View help", aliases) {
-            withArg(Argument("arg", "page | command", false, "The page to view or command to get help for") {
-                +arrayOf<(String?) -> Any?>(ArgumentTypes.NUMBER, ArgumentTypes.STRING)
-            })
-            handler = handler@{
-                if(it.sender == null) return@handler
+    fun helpCommand(name: String = "help", aliases: List<String> = listOf("?")) {
+        val cmd = build(createCommand(name, "View help")) {
+            aliases(aliases)
+            handler = handler@ {
                 val split = it.prefix.split("\\s+")
                 val fullCmdPath = if (split.isEmpty()) "" else split.slice(0 until split.lastIndex).joinToString(" ")
                 var page = 1
-                val help = getHelpListing(fullCmdPath, it.sender)
+                val help = this@CommandManager.getHelpListing(fullCmdPath, it.sender)
                 val arg = it["arg"]
-                if(arg != null) {
-                    if(arg is Number) page = arg.toInt()
+                if (arg != null) {
+                    if (arg is Number) page = arg.toInt()
                     else {
-                        val name = arg as String
-                        val command = get(name)
-                        if(command == null) {
-                            it.sender.printErr("Sub-command with the name/alias '%s' does not exist", name)
+                        val cmdName = arg as String
+                        val command = this@CommandManager[cmdName]
+                        if (command == null) {
+                            it.sender.printErr("Sub-command with the name/alias '%s' does not exist", cmdName)
                             return@handler
                         }
 
                         it.sender.print("${help.formatFullCommand(fullCmdPath).trim()} ${help.formatSimpleCommand(command)}")
 
-                        command.arguments.forEach { arg ->
-                            it.sender.print("  ${help.formatArg(arg.shownDisplay, arg.required)} ${help.formatDescription(arg.desc ?: "")}")
+                        command.args.forEach { a ->
+                            it.sender.print("  ${help.formatArg(a.shownDisplay, a.isRequired)} ${help.formatDescription(a.desc)}")
                         }
                         return@handler
                     }
                 }
 
                 val shownHelp = help.getHelp(page)
-                if(shownHelp == null) {
+                if (shownHelp == null) {
                     it.sender.printErr("Page %d does not exist", page)
                     return@handler
                 }
 
                 shownHelp.forEach { s -> it.sender.print(s) }
             }
-        })
+        }
+        add(cmd)
+    }
+
+    fun add(command: C) {
+        require(_commands.firstOrNull { it.conflictsWith(command) } == null) {
+            "Command name/alias conflicts with another command in this manager"
+        }
+    }
+
+    operator fun get(alias: String): C? = _commands.firstOrNull { it.hasAlias(alias) }
+
+    // separate by strings or
+    fun dispatch(sender: S, fullCmd: String) {
+        require(Regex("[\\n\\r\\f]") !in fullCmd) { "command string cannot contain newline characters" }
+        val tokenizer = Tokenizer(fullCmd)
+        tokenizer.addTokenType(Tokenizer.string(), 0)
+        tokenizer.addTokenType("\\S+", 1)
+        var token = tokenizer.next()
+        val parts = ArrayList<String>()
+        while (token != null) {
+            parts.add(token.match)
+            token = tokenizer.next()
+        }
+        dispatch(sender, parts)
+    }
+
+    fun dispatch(sender: S, fullCmd: List<String>) {
+        require(!fullCmd.isEmpty()) { "Command cannot be empty" }
+        val name = fullCmd[0]
+        val cmd = get(name)
+        if (cmd == null) {
+            sender.printErr("Command %s not found", name)
+            return
+        }
+
+        val rest = fullCmd.slice(1..fullCmd.lastIndex)
+        if (rest.isEmpty() || cmd.commands.isEmpty()) {
+            val context = cmd.createContext(name, cmd.getParts(sender, rest) ?: return)
+
+            context.parts.forEach {
+                val arg = it.arg
+                if (arg != null && arg.isRequired && !arg.nullable && it.value == null) {
+                    sender.printErr("Invalid input for argument '%s': \"%s\"", name, arg.shownDisplay, it.input)
+                    return@dispatch
+                }
+            }
+
+            if (commandWillDispatch(context)) {
+                try {
+                    context.dispatchSelf()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    sender.printErr("An error occurred while running this command")
+                }
+                commandDidDispatch(context)
+            }
+            return
+        }
+
+        cmd.commands.dispatch(sender, rest)
+    }
+
+    open fun getVisible(sender: CommandSender?): List<C> {
+        val filter = sender == null
+        return commands.filter { filter || !it.isHidden }
     }
 
     open fun getHelpListing(fullCmd: String, sender: CommandSender?) = HelpListing(fullCmd, getVisible(sender).toMutableList())
 
-    open fun getVisible(sender: CommandSender?) = commands.filter { !it.hidden }
+    fun commandWillDispatch(context: CommandContext<C, S>) = true
+    fun commandDidDispatch(context: CommandContext<C, S>) {}
 
-    operator fun Command.unaryPlus() = plusAssign(this)
+    operator fun contains(alias: String) = get(alias) != null
 
-    open fun commandWillDispatch(cmd: Command, context: CommandContext) = true
-    open fun commandDidDispatch(cmd: Command, context: CommandContext) = true
-
-    fun sort(sortFn: Comparator<Command> = Comparator { a: Command, b: Command -> a.name.compareTo(b.name) }): CommandManager {
-        commands.sortWith(sortFn)
-        return this
-    }
-
+    abstract fun copy(): CommandManager<C, S>
 }

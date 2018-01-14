@@ -1,27 +1,18 @@
 package info.malignantshadow.api.commands
 
-import info.malignantshadow.api.util.arguments.ParsedArguments
-
-open class CommandContext(
+class CommandContext<C: Command<C, S>, S: CommandSender>(
         val prefix: String,
-        val sender: CommandSender?,
-        val cmd: Command,
-        val parsedArgs: ParsedArguments
+        val cmd: C,
+        val sender: S,
+        val parts: List<Command.Part>
 ) {
 
-    val inputJoined = getInputJoined()
-    val extraJoined = getExtraJoined()
-    val fullCommandString = "$prefix $inputJoined $extraJoined"
+    val extra = parts.filter { it.isExtra }
 
-    fun getInputJoined(delimiter: String = " ") = parsedArgs.input.joinToString(delimiter)
-    fun getExtraJoined(delimiter: String = " ") = parsedArgs.extra.joinToString(delimiter)
+    operator fun get(name: String) = getPart(name)?.value
 
-    operator fun contains(name: String) = name in parsedArgs
-    fun hasInputFor(name: String) = getArg(name)?.input != null ?: false
+    fun getPart(name: String) = parts.firstOrNull { it.arg?.name == name }
 
-    operator fun get(name: String) = parsedArgs.getValue(name)
-    fun getArg(name: String) = parsedArgs[name]
-
-    fun dispatchSelf() = cmd.handler?.invoke(this) != null
+    fun dispatchSelf() = cmd.handler?.invoke(this)
 
 }
