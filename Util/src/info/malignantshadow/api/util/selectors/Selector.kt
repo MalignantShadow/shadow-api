@@ -1,6 +1,6 @@
 package info.malignantshadow.api.util.selectors
 
-import info.malignantshadow.api.util.parsing.ArgumentTypes
+import info.malignantshadow.api.util.parsing.StringTransformers
 
 open class Selector(val name: String, var args: ArrayList<SelectorArgument>) : Iterable<SelectorArgument> {
 
@@ -16,7 +16,7 @@ open class Selector(val name: String, var args: ArrayList<SelectorArgument>) : I
     fun getInputFor(name: String) = get(name)?.input
     fun hasInputFor(name: String) = getInputFor(name) != null
 
-    fun getAll(name: String) = getAll(name, ArgumentTypes.STRING)
+    fun getAll(name: String) = getAll(name, StringTransformers.STRING)
 
     @JvmOverloads
     fun <R> getAll(name: String, type: (String?) -> R?, max: Int = -1): ArrayList<R?>? {
@@ -33,7 +33,7 @@ open class Selector(val name: String, var args: ArrayList<SelectorArgument>) : I
         return arr
     }
 
-    fun getOne(name: String) = getOne(name, ArgumentTypes.STRING)
+    fun getOne(name: String) = getOne(name, StringTransformers.STRING)
     fun <R> getOne(name: String, type: (String?) -> R?) = getAll(name, type, 1)?.getOrNull(0)
 
     fun isSet(name: String) = get(name) != null
