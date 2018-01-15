@@ -94,7 +94,7 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
 
             context.parts.forEach {
                 val arg = it.arg
-                if (arg != null && arg.isRequired && !arg.nullable && it.value == null) {
+                if (arg != null && arg.isRequired && !arg.isNullable && it.value == null) {
                     sender.printErr("Invalid input for argument '%s': \"%s\"", name, arg.shownDisplay, it.input)
                     return@dispatch
                 }

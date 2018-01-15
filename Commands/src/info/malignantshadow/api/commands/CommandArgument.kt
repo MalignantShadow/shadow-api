@@ -7,7 +7,7 @@ class CommandArgument(val name: String, val desc: String, val isRequired: Boolea
     val shownDisplay get() = if(display.isBlank()) name else display
     val types = ArrayList<(String) -> Any?>()
     var def: Any? = null
-    var nullable = false
+    var isNullable = false
 
     fun shouldUseDefault(input: String?) = input == null || input.isBlank()
 
