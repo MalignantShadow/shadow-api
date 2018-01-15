@@ -88,6 +88,11 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
         }
 
         val rest = fullCmd.slice(1..fullCmd.lastIndex)
+        if(rest.isEmpty() && !cmd.isParent && cmd.handler == null) {
+            sender.printErr("Command '%s' requires a sub-command", name)
+            return
+        }
+
         if (rest.isEmpty() || cmd.commands.isEmpty()) {
             val context = cmd.createContext(name, cmd.getParts(sender, rest) ?: return)
 
