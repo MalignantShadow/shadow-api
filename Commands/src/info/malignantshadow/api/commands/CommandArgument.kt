@@ -16,6 +16,11 @@ class CommandArgument(val name: String, val desc: String) {
         types.add(type)
     }
 
+    fun typeOf(types: Iterable<(String) -> Any?>) {
+        this.types.clear()
+        this.types.addAll(types)
+    }
+
     fun isNullable() { isNullable = true }
     fun isRequired() { isRequired = true }
 
