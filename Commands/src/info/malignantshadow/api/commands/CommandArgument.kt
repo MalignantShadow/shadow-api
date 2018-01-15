@@ -11,7 +11,7 @@ class CommandArgument(val name: String, val desc: String, val isRequired: Boolea
 
     fun shouldUseDefault(input: String?) = input == null || input.isBlank()
 
-    infix fun type(type: (String) -> Any?) {
+    fun type(type: (String) -> Any?) {
         types.add(type)
     }
 
