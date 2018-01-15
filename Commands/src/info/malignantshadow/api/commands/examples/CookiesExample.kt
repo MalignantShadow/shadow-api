@@ -96,6 +96,7 @@ val cookieManager = commandManager {
 }
 
 fun main(args: Array<String>) {
-    cookieManager.dispatch(me, "c inv")
-//    cookieManager.dispatch(me, args.joinToString(separator = " "))
+    val joined = args.joinToString(separator = " ")
+    for (cmd in joined.split(Regex(";\\s+")))
+        cookieManager.dispatch(me, cmd)
 }
