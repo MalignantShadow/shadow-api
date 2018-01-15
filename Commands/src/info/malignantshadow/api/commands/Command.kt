@@ -25,7 +25,7 @@ abstract class Command<C: Command<C, S>, S: CommandSender>(val name: String, val
     fun command(name: String, desc: String, init: Command<C, S>.() -> Unit): Command<C, S> = commands.command(name, desc, init)
 
     fun alias(lazyValue: () -> String) { alias(lazyValue()) }
-    fun alias(alias: String) {
+    infix fun alias(alias: String) {
         if(alias !in _aliases) _aliases.add(alias)
     }
 
