@@ -103,3 +103,21 @@ fun String.unescape(): String {
         str
     }
 }
+
+fun String.toProperCase(): String {
+    if (isEmpty())
+        return ""
+    val unimportant = arrayOf("a", "an", "and", "but", "is", "are", "for", "nor", "of", "or", "so", "the", "to", "yet", "by")
+    val split = split("\\s+")
+    var result = ""
+    for (i in split.indices) {
+        val word = split[i]
+        result +=
+                //first and last words are always capital
+                (if (word !in unimportant || i == 0 || i == split.size - 1)
+                    word.capitalize()
+                else
+                    word.toLowerCase()) + " "
+    }
+    return result.trim { it <= ' ' }
+}
