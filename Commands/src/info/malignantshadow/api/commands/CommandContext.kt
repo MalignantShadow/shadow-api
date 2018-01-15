@@ -13,6 +13,8 @@ class CommandContext<C: Command<C, S>, S: CommandSender>(
 
     fun getPart(name: String) = parts.firstOrNull { it.arg?.name == name }
 
+    fun isPresent(name: String) = getPart(name) != null
+
     fun dispatchSelf() = cmd.handler?.invoke(this)
 
 }
