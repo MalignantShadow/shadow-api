@@ -15,6 +15,8 @@ class CommandContext<C: Command<C, S>, S: CommandSender>(
 
     fun isPresent(name: String) = getPart(name) != null
 
+    fun getInput(name: String) = getPart(name)?.input
+
     fun dispatchSelf() = cmd.handler?.invoke(this)
 
 }
