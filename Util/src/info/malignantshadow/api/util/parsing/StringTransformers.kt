@@ -113,6 +113,16 @@ object StringTransformers {
     /**
      * Parse the input as an Enum value
      *
+     * @param E The Enum
+     * @param caseSensitive Whether the names/aliases of the Enum values are matched case-sensitive the input string
+     * @return a function that returns an Enum value, or null if no match was found
+     */
+    inline fun <reified E: Enum<E>> enumValue(caseSensitive: Boolean = false) =
+            enumValue(enumValues<E>().toList(), caseSensitive)
+
+    /**
+     * Parse the input as an Enum value
+     *
      * @param values The available values
      * @param caseSensitive Whether the names/aliases of the Enum values are matched case-sensitive the input string
      * @return a function that returns an Enum value, or null if no match was found
