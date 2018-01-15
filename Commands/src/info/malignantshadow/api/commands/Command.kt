@@ -13,7 +13,7 @@ abstract class Command<C: Command<C, S>, S: CommandSender>(val name: String, val
     var isHidden = false
 
     abstract val commands: CommandManager<C, S>
-    val aliases = _aliases.toList()
+    val aliases get () = _aliases.toList()
     val allAliases get() = listOf(name, *aliases.toTypedArray())
     val args get() = _args
     val extraArg get() =_extraArg
