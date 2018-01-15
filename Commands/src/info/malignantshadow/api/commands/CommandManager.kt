@@ -83,7 +83,7 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
         val name = fullCmd[0]
         val cmd = get(name)
         if (cmd == null) {
-            sender.printErr("Command %s not found", name)
+            sender.printErr("Command '%s' not found", name)
             return
         }
 
