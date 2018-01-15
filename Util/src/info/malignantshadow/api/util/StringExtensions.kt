@@ -108,10 +108,10 @@ fun String.toProperCase(): String {
     if (isEmpty())
         return ""
     val unimportant = arrayOf("a", "an", "and", "but", "is", "are", "for", "nor", "of", "or", "so", "the", "to", "yet", "by")
-    val split = split("\\s+")
+    val split = split(Regex("\\s+"))
     var result = ""
     for (i in split.indices) {
-        val word = split[i]
+        val word = split[i].toLowerCase()
         result +=
                 //first and last words are always capital
                 (if (word !in unimportant || i == 0 || i == split.size - 1)
