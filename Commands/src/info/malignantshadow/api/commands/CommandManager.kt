@@ -60,11 +60,7 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
         add(cmd)
     }
 
-    fun add(command: C) {
-        require(_commands.firstOrNull { it.conflictsWith(command) } == null) {
-            "Command name/alias conflicts with another command in this manager"
-        }
-    }
+    fun add(command: C) { _commands.add(command) }
 
     operator fun get(alias: String): C? = _commands.firstOrNull { it.hasAlias(alias) }
 
