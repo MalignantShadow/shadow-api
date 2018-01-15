@@ -79,8 +79,13 @@ val cookieManager = commandManager {
                 isNullable()
                 typeOf<CookieType>()
             }
-            handler = { ctx ->
+            handler = handler@ { ctx ->
                 val type = ctx["type"] as CookieType?
+                if (ctx.isPresent("type") && type == null) {
+                    ctx.sender.printErr("Unknown cookie type '${ctx.getInput("type")}'")
+                    return@handler
+                }
+
                 if (type == null) {
                     for (t in CookieType)
                         ctx.sender.print("${t.getName()} - ${CookieInventory[t]}")
