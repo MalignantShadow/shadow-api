@@ -72,7 +72,7 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
         var token = tokenizer.next()
         val parts = ArrayList<String>()
         while (token != null) {
-            parts.add(token.match)
+            parts.add(if(token.type == 0) token.match.substring(1..token.match.length) else token.match)
             token = tokenizer.next()
         }
         dispatch(sender, parts)
