@@ -1,14 +1,13 @@
 package info.malignantshadow.api.commands
 
 @CommandDsl
-class CommandArgument(val name: String, val desc: String) {
+class CommandArgument(val name: String, val desc: String, var isRequired: Boolean = false) {
 
     var display: String = ""
     val shownDisplay get() = if(display.isBlank()) name else display
     val types = ArrayList<(String) -> Any?>()
     var def: Any? = null
     var isNullable = false
-    var isRequired = false
 
     fun shouldUseDefault(input: String?) = input == null || input.isBlank()
 
