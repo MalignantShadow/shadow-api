@@ -40,6 +40,11 @@ abstract class Command<C: Command<C, S>, S: CommandSender>(val name: String, val
     fun arg(name: String, desc: String, required: Boolean = false, init: CommandArgument.() -> Unit) =
             _args.build(CommandArgument(name, desc, required), init)
 
+    fun args(args: Iterable<CommandArgument>) {
+        _args.clear()
+        _args.addAll(args)
+    }
+
     fun extra(name: String, desc: String, required: Boolean = false) {
         _extraArg = CommandArgument(name, desc, required)
     }
