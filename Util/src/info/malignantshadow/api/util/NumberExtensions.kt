@@ -35,3 +35,23 @@ fun Double.clamp(min: Double, max: Double) = Math.max(min, Math.min(max, this))
  * @param max The maximum value the float
  */
 fun Float.clamp(min: Float, max: Float) = Math.max(min, Math.min(max, this))
+
+/**
+ * Return the maximum of this and `other`
+ */
+fun Int.max(other: Int) = Math.max(this, other)
+
+/**
+ * Return the maximum of this and `other`
+ */
+fun Double.max(other: Double) = Math.max(this, other)
+
+/**
+ * Return the maximum of this and `other`
+ */
+fun Float.max(other: Float) = Math.max(this, other)
+
+/**
+ * Return the maximum of this and `other`
+ */
+fun Long.max(other: Long) = Math.max(this, other)
