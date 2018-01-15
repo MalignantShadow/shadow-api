@@ -4,7 +4,7 @@ import info.malignantshadow.api.config.ConfigBoolean
 import info.malignantshadow.api.config.ConfigSection
 import info.malignantshadow.api.config.ConfigSequence
 import info.malignantshadow.api.config.processor.TextFileConfigProcessor
-import info.malignantshadow.api.util.arguments.ArgumentTypes
+import info.malignantshadow.api.util.parsing.ArgumentTypes
 import info.malignantshadow.api.util.escape
 import info.malignantshadow.api.util.indent
 import info.malignantshadow.api.util.unescape

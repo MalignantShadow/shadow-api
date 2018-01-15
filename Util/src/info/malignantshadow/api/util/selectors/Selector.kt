@@ -1,6 +1,6 @@
 package info.malignantshadow.api.util.selectors
 
-import info.malignantshadow.api.util.arguments.ArgumentTypes
+import info.malignantshadow.api.util.parsing.ArgumentTypes
 
 open class Selector(val name: String, var args: ArrayList<SelectorArgument>) : Iterable<SelectorArgument> {
 

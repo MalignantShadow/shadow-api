@@ -1,6 +1,6 @@
 package info.malignantshadow.api.config
 
-import info.malignantshadow.api.util.arguments.ArgumentTypes
+import info.malignantshadow.api.util.parsing.ArgumentTypes
 
 /**
  *
