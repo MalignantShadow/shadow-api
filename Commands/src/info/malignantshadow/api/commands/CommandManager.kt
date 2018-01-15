@@ -64,7 +64,6 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
 
     operator fun get(alias: String): C? = _commands.firstOrNull { it.hasAlias(alias) }
 
-    // separate by strings or
     fun dispatch(sender: S, fullCmd: String) {
         require(Regex("[\\n\\r\\f]") !in fullCmd) { "command string cannot contain newline characters" }
         val tokenizer = Tokenizer(fullCmd)
