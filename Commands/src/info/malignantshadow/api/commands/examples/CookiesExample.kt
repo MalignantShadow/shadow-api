@@ -43,9 +43,9 @@ object CookieInventory {
 
 fun eatCookie(ctx: SimpleCommandContext) {
     val amount = ctx["amount"] as Int
-    CookieInventory.remove(ctx["type"] as CookieType, amount)
-    ctx.sender.print("Ate %d cookie%s", amount, if (amount == 1) "" else "s")
-    ctx.sender.print("Yummy!")
+    val type = ctx["type"] as CookieType
+    CookieInventory.remove(type, amount)
+    ctx.sender.print("Ate %d ${type.getName()} cookie%s. Yummy!", amount, if (amount == 1) "" else "s")
 }
 
 val me = CommandSender()
@@ -64,8 +64,9 @@ val cookieManager = commandManager {
             // handler can be an anonymous function
             handler = { ctx ->
                 val amount = ctx["amount"] as Int
-                CookieInventory.add(ctx["type"] as CookieType, amount)
-                ctx.sender.print("Baked $amount cookie%s", if (amount == 1) "" else "s")
+                val type = ctx["type"] as CookieType
+                CookieInventory.add(type, amount)
+                ctx.sender.print("Baked $amount ${type.getName()} cookie%s", if (amount == 1) "" else "s")
             }
         }
         command("eat", "Eat cookies") {
