@@ -12,7 +12,7 @@ class CommandArgument(val name: String, val desc: String) {
 
     fun shouldUseDefault(input: String?) = input == null || input.isBlank()
 
-    fun type(type: (String) -> Any?) {
+    fun typeOf(type: (String) -> Any?) {
         types.add(type)
     }
 
