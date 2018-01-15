@@ -11,6 +11,12 @@ class CommandArgument(val name: String, val desc: String, val isRequired: Boolea
 
     fun shouldUseDefault(input: String?) = input == null || input.isBlank()
 
+    infix fun type(type: (String) -> Any?) {
+        types.add(type)
+    }
+
+    fun isNullable() { isNullable = true }
+
     fun getValueFrom(input: String): Any? {
         if(shouldUseDefault(input) || types.isEmpty()) return def
 

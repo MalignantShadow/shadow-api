@@ -29,6 +29,8 @@ abstract class Command<C: Command<C, S>, S: CommandSender>(val name: String, val
         if(alias !in _aliases) _aliases.add(alias)
     }
 
+    fun isHidden() { isHidden = true }
+
     fun aliases(lazyValue: () -> Iterable<String>) { aliases(lazyValue()) }
     fun aliases(aliases: Iterable<String>) {
         _aliases.clear()
