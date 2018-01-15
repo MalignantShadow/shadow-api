@@ -26,7 +26,7 @@ open class HelpListing(val fullCmd: String, val commands: MutableList<Command<*,
         return "${formatAliases(cmd.allAliases)} ${formatArgs(dummy)} ${formatDescription(cmd.desc)}"
     }
 
-    open fun getCommandHelp(cmd: Command<*, *>): String = if(cmd.isParent) formatCommandNested(cmd) else formatSimpleCommand(cmd)
+    open fun getCommandHelp(cmd: Command<*, *>): String = if (cmd.isParent) formatCommandNested(cmd) else formatSimpleCommand(cmd)
 
     open fun getHelp(page: Int = 1): ArrayList<String>? {
         val help = arrayListOf<String>()
