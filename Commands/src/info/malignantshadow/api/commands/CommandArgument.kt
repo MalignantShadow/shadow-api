@@ -1,5 +1,7 @@
 package info.malignantshadow.api.commands
 
+import info.malignantshadow.api.util.parsing.StringTransformers
+
 @CommandDsl
 class CommandArgument(val name: String, val desc: String, var isRequired: Boolean = false) {
 
@@ -19,6 +21,11 @@ class CommandArgument(val name: String, val desc: String, var isRequired: Boolea
         this.types.clear()
         this.types.addAll(types)
     }
+
+    inline fun <reified E: Enum<E>> typeOf(caseSensitive: Boolean = false) {
+        types.add(StringTransformers.enumValue<E>())
+    }
+
 
     fun isNullable() { isNullable = true }
     fun isRequired() { isRequired = true }
