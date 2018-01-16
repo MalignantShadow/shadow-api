@@ -9,7 +9,7 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
     private val _args = ArrayList<CommandArgument>()
     private var _extraArg: CommandArgument? = null
 
-    var handler: ((CommandContext<C, S>) -> Unit)? = null
+    var handler: ((CommandContext<C, S>) -> CommandResult?)? = null
     var isHidden = false
 
     abstract val commands: CommandManager<C, S>

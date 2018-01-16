@@ -1,5 +1,7 @@
 package info.malignantshadow.api.commands.examples
 
+import info.malignantshadow.api.commands.CommandError
+import info.malignantshadow.api.commands.CommandResult
 import info.malignantshadow.api.commands.CommandSender
 import info.malignantshadow.api.commands.simple.SimpleCommandContext
 import info.malignantshadow.api.commands.simple.commandManager
@@ -41,11 +43,18 @@ object CookieInventory {
 
 }
 
-fun eatCookie(ctx: SimpleCommandContext) {
+const val COOKIES_EATEN = 0
+const val COOKIES_BAKED = 1
+const val COOKIES_CHECKED = 2
+
+data class CookieCommandResult(val type: Int, val cookieType: CookieType?, val amount: Int) : CommandResult
+
+fun eatCookie(ctx: SimpleCommandContext): CookieCommandResult {
     val amount = ctx["amount"] as Int
     val type = ctx["type"] as CookieType
     CookieInventory.remove(type, amount)
     ctx.sender.print("Ate %d ${type.getName()} cookie%s. Yummy!", amount, if (amount == 1) "" else "s")
+    return CookieCommandResult(COOKIES_EATEN, type, amount)
 }
 
 val me = CommandSender()
@@ -67,6 +76,7 @@ val cookieManager = commandManager {
                 val type = ctx["type"] as CookieType
                 CookieInventory.add(type, amount)
                 ctx.sender.print("Baked $amount ${type.getName()} cookie%s", if (amount == 1) "" else "s")
+                CookieCommandResult(COOKIES_BAKED, type, amount)
             }
         }
         command("eat", "Eat cookies") {
@@ -83,16 +93,21 @@ val cookieManager = commandManager {
                 val type = ctx["type"] as CookieType?
                 if (ctx.isPresent("type") && type == null) {
                     ctx.sender.printErr("Unknown cookie type '${ctx.getInput("type")}'")
-                    return@handler
+                    return@handler CommandError(ctx)
                 }
 
                 if (type == null) {
-                    for (t in CookieType)
-                        ctx.sender.print("${t.getName()} - ${CookieInventory[t]}")
-                } else {
-                    val amount = CookieInventory[type]
-                    ctx.sender.print("$amount cookie%s of type '${type.getName()}'", if (amount == 1) "" else "s")
+                    var count = 0
+                    CookieType.forEach {
+                        val amount = CookieInventory[it]
+                        ctx.sender.print("${it.getName()} - $amount")
+                        count += amount
+                    }
+                    return@handler CookieCommandResult(COOKIES_CHECKED, null, count)
                 }
+                val amount = CookieInventory[type]
+                ctx.sender.print("$amount cookie%s of type '${type.getName()}'", if (amount == 1) "" else "s")
+                return@handler CookieCommandResult(COOKIES_CHECKED, type, amount)
             }
         }
         helpCommand()

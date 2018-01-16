@@ -6,6 +6,22 @@ import info.malignantshadow.api.util.parsing.Tokenizer
 @CommandDsl
 abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
 
+    companion object {
+        const val HELP_SENT = 0
+        const val HELP_UNKNOWN_COMMAND = 1
+        const val HELP_PAGE_NOT_FOUND = 2
+
+        const val CMD_NOT_FOUND = 0
+        const val CMD_REQUIRES_SUB = 1
+        const val CMD_INVALID_INPUT = 2
+        const val CMD_EXCEPTION_IN_BODY = 3
+        const val CMD_NOT_DISPATCHED = 4
+    }
+
+    data class HelpResult(val result: Int, val data: Any? = null) : CommandResult
+
+    inner class CommandDispatchErrorResult(sender: S, cmd: String, args: List<String>, error: Int) : CommandResult
+
     private val _commands = ArrayList<C>()
     protected abstract fun createCommand(name: String, desc: String): C
 
@@ -36,7 +52,7 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
                         val command = this@CommandManager[cmdName]
                         if (command == null) {
                             it.sender.printErr("Sub-command with the name/alias '%s' does not exist", cmdName)
-                            return@handler
+                            return@handler HelpResult(HELP_UNKNOWN_COMMAND, cmdName)
                         }
 
                         it.sender.print("${help.formatFullCommand(fullCmdPath).trim()} ${help.formatSimpleCommand(command)}")
@@ -44,17 +60,18 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
                         command.args.forEach { a ->
                             it.sender.print("  ${help.formatArg(a.shownDisplay, a.isRequired)} ${help.formatDescription(a.desc)}")
                         }
-                        return@handler
+                        return@handler HelpResult(HELP_SENT)
                     }
                 }
 
                 val shownHelp = help.getHelp(page)
                 if (shownHelp == null) {
                     it.sender.printErr("Page %d does not exist", page)
-                    return@handler
+                    return@handler HelpResult(HELP_PAGE_NOT_FOUND, page)
                 }
 
                 shownHelp.forEach { s -> it.sender.print(s) }
+                return@handler HelpResult(HELP_SENT)
             }
         }
         add(cmd)
@@ -64,7 +81,7 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
 
     operator fun get(alias: String): C? = _commands.firstOrNull { it.hasAlias(alias) }
 
-    fun dispatch(sender: S, fullCmd: String) {
+    fun dispatch(sender: S, fullCmd: String): CommandResult? {
         require(Regex("[\\n\\r\\f]") !in fullCmd) { "command string cannot contain newline characters" }
         val tokenizer = Tokenizer(fullCmd)
         tokenizer.addTokenType(Tokenizer.string(), 0)
@@ -75,48 +92,51 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
             parts.add(if(token.type == 0) token.match.substring(1..token.match.length) else token.match)
             token = tokenizer.next()
         }
-        dispatch(sender, parts)
+        return dispatch(sender, parts)
     }
 
-    fun dispatch(sender: S, fullCmd: List<String>) {
+    fun dispatch(sender: S, fullCmd: List<String>): CommandResult? {
         require(!fullCmd.isEmpty()) { "Command cannot be empty" }
         val name = fullCmd[0]
         val cmd = get(name)
+        val rest = fullCmd.slice(1..fullCmd.lastIndex)
         if (cmd == null) {
             sender.printErr("Command '%s' not found", name)
-            return
+            return CommandDispatchErrorResult(sender, name, rest, CMD_NOT_FOUND)
         }
 
-        val rest = fullCmd.slice(1..fullCmd.lastIndex)
         if(rest.isEmpty() && !cmd.isParent && cmd.handler == null) {
             sender.printErr("Command '%s' requires a sub-command", name)
-            return
+            return CommandDispatchErrorResult(sender, name, rest, CMD_REQUIRES_SUB)
         }
 
         if (rest.isEmpty() || cmd.commands.isEmpty()) {
-            val context = cmd.createContext(name, cmd.getParts(sender, rest) ?: return)
+            val context = cmd.createContext(name, cmd.getParts(sender, rest) ?: return null)
 
             context.parts.forEach {
                 val arg = it.arg
                 if (arg != null && arg.isRequired && !arg.isNullable && it.value == null) {
                     sender.printErr("Invalid input for argument '%s': \"%s\"", arg.shownDisplay, it.input)
-                    return@dispatch
+                    return@dispatch CommandDispatchErrorResult(sender, name, rest, CMD_INVALID_INPUT)
                 }
             }
 
             if (commandWillDispatch(context)) {
-                try {
+                var result: CommandResult?
+                result = try {
                     context.dispatchSelf()
                 } catch (e: Exception) {
                     e.printStackTrace()
                     sender.printErr("An error occurred while running this command")
+                    CommandDispatchErrorResult(sender, name, rest, CMD_EXCEPTION_IN_BODY)
                 }
                 commandDidDispatch(context)
+                return result
             }
-            return
+            return CommandDispatchErrorResult(sender, name, rest, CMD_NOT_DISPATCHED)
         }
 
-        cmd.commands.dispatch(sender, rest)
+        return cmd.commands.dispatch(sender, rest)
     }
 
     open fun getVisible(sender: CommandSender?): List<C> {
