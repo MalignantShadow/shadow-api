@@ -7,7 +7,7 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
 
     private val _aliases = ArrayList<String>()
     private val _params = ArrayList<CommandParameter>()
-    private var _extraArg: CommandParameter? = null
+    private var _extraParam: CommandParameter? = null
 
     var handler: ((CommandContext<C, S>) -> CommandResult?)? = null
     var isHidden = false
@@ -94,7 +94,7 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
         }
 
         if (optionalLeft > 0) {
-            (index until parts.size).mapTo(commandParts) { Command.Part(_extraArg, parts[it], true) }
+            (index until parts.size).mapTo(commandParts) { Command.Part(_extraParam, parts[it], true) }
         }
 
         return commandParts
