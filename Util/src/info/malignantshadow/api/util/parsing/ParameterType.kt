@@ -84,18 +84,18 @@ object ParameterType {
     fun <R> pattern(transform: (String?) -> R) = { input: String -> Pattern(input, transform) }
 
     /**
-     * Parse the input as an array of any of the given types
+     * Parse the input as a list of any of the given types
      *
      * @param types The accepted types
      */
     //TODO: Allow the input to escape commas
     @JvmStatic
-    fun arrayOf(vararg types: ParameterToken<Any?>): (String) -> Array<Any?> = { input: String? ->
+    fun listOf(vararg types: ParameterToken<Any?>): (String) -> List<Any?> = { input: String? ->
         if (input == null)
-            emptyArray()
+            emptyList()
         else {
             val split = input.split(",")
-            val values = arrayOfNulls<Any?>(split.size)
+            val values = ArrayList<Any?>()
             for (i in 0 until split.size) {
                 val str = split[i]
                 var v: Any? = null
@@ -105,7 +105,7 @@ object ParameterType {
                 }
                 values[i] = v
             }
-            values
+            values.toList()
         }
     }
 
@@ -175,7 +175,7 @@ object ParameterType {
     }
 
     /**
-     * Parse the input as an Int representing bitwise flags. The input is parsed as an [arrayOf] `Int`s,
+     * Parse the input as an Int representing bitwise flags. The input is parsed as an [listOf] `Int`s,
      * using the specified function. The Ints are then bitwise OR'd together.
      *
      * @param flagType A function that parses the input as a flag
@@ -184,7 +184,7 @@ object ParameterType {
     @JvmStatic
     fun bitwiseFlag(flagType: ParameterToken<Int?>): (String) -> Int = label@ { input: String ->
         var bits = 0
-        val values = arrayOf(flagType)(input)
+        val values = listOf(flagType)(input)
         values.forEach { if (it != null) bits = bits or (it as Int) }
         return@label bits
     }
