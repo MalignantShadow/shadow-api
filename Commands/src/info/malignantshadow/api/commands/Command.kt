@@ -40,16 +40,24 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
         aliases(lazyValue())
     }
 
-    fun aliases(aliases: Iterable<String>) {
+    fun setAliases(aliases: Iterable<String>) {
         _aliases.clear()
+        aliases(aliases)
+    }
+
+    fun aliases(aliases: Iterable<String>) {
         aliases.forEach { alias(it) }
     }
 
     fun param(name: String, desc: String, required: Boolean = false, init: CommandParameter.() -> Unit) =
             _params.build(CommandParameter(name, desc, required), init)
 
-    fun params(params: Iterable<CommandParameter>) {
+    fun setParams(params: Iterable<CommandParameter>) {
         _params.clear()
+        params(params)
+    }
+
+    fun params(params: Iterable<CommandParameter>) {
         _params.addAll(params)
     }
 

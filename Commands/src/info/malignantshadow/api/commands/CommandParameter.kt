@@ -17,8 +17,12 @@ class CommandParameter(val name: String, val desc: String, var isRequired: Boole
         types.add(type)
     }
 
-    fun typeOf(types: Iterable<(String) -> Any?>) {
+    fun setTypes(types: Iterable<(String) -> Any?>) {
         this.types.clear()
+        typeOf(types)
+    }
+
+    fun typeOf(types: Iterable<(String) -> Any?>) {
         this.types.addAll(types)
     }
 
