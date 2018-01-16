@@ -145,8 +145,8 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
 
     open fun getHelpListing(fullCmd: String, sender: CommandSender?) = HelpListing(fullCmd, getVisible(sender).toMutableList())
 
-    fun commandWillDispatch(context: CommandContext<C, S>) = true
-    fun commandDidDispatch(context: CommandContext<C, S>) {}
+    open fun commandWillDispatch(context: CommandContext<C, S>) = true
+    open fun commandDidDispatch(context: CommandContext<C, S>) {}
 
     operator fun contains(alias: String) = get(alias) != null
 
