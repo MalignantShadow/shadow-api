@@ -6,13 +6,13 @@ import info.malignantshadow.api.util.equalsAny
 import info.malignantshadow.api.util.random.Pattern
 import info.malignantshadow.api.util.selectors.Selector
 
-typealias Type<T> = (String?) -> T
+typealias ParameterToken<T> = (String) -> T
 
 /**
  * A utility object holding different types of argument types
  * @author Shad0w (Caleb Downs)
  */
-object StringTransformers {
+object ParameterType {
 
     /**
      * Parse the input as a String. Simply returns the input.

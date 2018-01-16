@@ -1,6 +1,6 @@
 package info.malignantshadow.api.commands
 
-import info.malignantshadow.api.util.parsing.StringTransformers
+import info.malignantshadow.api.util.parsing.ParameterType
 
 @CommandDsl
 class CommandParameter(val name: String, val desc: String, var isRequired: Boolean = false) {
@@ -27,7 +27,7 @@ class CommandParameter(val name: String, val desc: String, var isRequired: Boole
     }
 
     inline fun <reified E: Enum<E>> typeOf(caseSensitive: Boolean = false) {
-        types.add(StringTransformers.enumValue<E>())
+        types.add(ParameterType.enumValue<E>())
     }
 
 

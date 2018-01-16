@@ -6,7 +6,7 @@ import info.malignantshadow.api.commands.CommandSender
 import info.malignantshadow.api.commands.simple.SimpleCommandContext
 import info.malignantshadow.api.commands.simple.commandManager
 import info.malignantshadow.api.util.max
-import info.malignantshadow.api.util.parsing.StringTransformers
+import info.malignantshadow.api.util.parsing.ParameterType
 import info.malignantshadow.api.util.toProperCase
 
 enum class CookieType {
@@ -67,7 +67,7 @@ val cookieManager = commandManager {
                 typeOf<CookieType>()
             }
             param("amount", "The amount of cookies") {
-                typeOf(StringTransformers.INT)
+                typeOf(ParameterType.INT)
                 def = 1
             }
             // handler can be an anonymous function
