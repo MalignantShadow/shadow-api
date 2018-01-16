@@ -141,7 +141,7 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
 
     fun getVisible(sender: S?): List<C> {
         val filter = sender == null
-        return commands.filter { filter || !it.isHidden }
+        return commands.filter { filter || !it.isHiddenFor(sender!!) }
     }
 
     open fun getHelpListing(fullCmd: String, sender: CommandSender?) = HelpListing(fullCmd, getVisible(sender).toMutableList())
