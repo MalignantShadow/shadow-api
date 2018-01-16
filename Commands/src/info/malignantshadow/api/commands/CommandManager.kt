@@ -110,7 +110,7 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
             return CommandDispatchErrorResult(sender, name, rest, CMD_REQUIRES_SUB)
         }
 
-        if (rest.isEmpty() || cmd.commands.isEmpty()) {
+        if ((rest.isEmpty() || cmd.commands.isEmpty()) && commandSelected(cmd)) {
             val context = cmd.createContext(name, cmd.getParts(sender, rest) ?: return null)
 
             context.parts.forEach {
@@ -145,6 +145,7 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
 
     open fun getHelpListing(fullCmd: String, sender: CommandSender?) = HelpListing(fullCmd, getVisible(sender).toMutableList())
 
+    open fun commandSelected(command: C): Boolean = true
     open fun commandWillDispatch(context: CommandContext<C, S>) = true
     open fun commandDidDispatch(context: CommandContext<C, S>) {}
 
