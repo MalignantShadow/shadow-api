@@ -122,8 +122,7 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
             }
 
             if (commandWillDispatch(context)) {
-                var result: CommandResult?
-                result = try {
+                val result = try {
                     context.dispatchSelf()
                 } catch (e: Exception) {
                     e.printStackTrace()
