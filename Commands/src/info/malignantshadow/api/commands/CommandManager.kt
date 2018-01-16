@@ -23,12 +23,13 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
     inner class CommandDispatchErrorResult(sender: S, cmd: String, args: List<String>, error: Int) : CommandResult
 
     private val _commands = ArrayList<C>()
-    protected abstract fun createCommand(name: String, desc: String): C
 
     val commands get() = _commands.toList()
     val size = _commands.size
 
     fun isEmpty() = _commands.isEmpty()
+
+    abstract fun createCommand(name: String, desc: String): C
 
     fun command(name: String, desc: String, init: C.() -> Unit): C {
         val cmd = build(createCommand(name, desc), init)
@@ -77,7 +78,9 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
         add(cmd)
     }
 
-    fun add(command: C) { _commands.add(command) }
+    fun add(command: C) {
+        _commands.add(command)
+    }
 
     operator fun get(alias: String): C? = _commands.firstOrNull { it.hasAlias(alias) }
 
@@ -89,7 +92,7 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
         var token = tokenizer.next()
         val parts = ArrayList<String>()
         while (token != null) {
-            parts.add(if(token.type == 0) token.match.substring(1..token.match.length) else token.match)
+            parts.add(if (token.type == 0) token.match.substring(1..token.match.length) else token.match)
             token = tokenizer.next()
         }
         return dispatch(sender, parts)
@@ -105,13 +108,12 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
             return CommandDispatchErrorResult(sender, name, rest, CMD_NOT_FOUND)
         }
 
-        if(rest.isEmpty() && !cmd.isParent && cmd.handler == null) {
+        if (rest.isEmpty() && !cmd.isParent && cmd.handler == null) {
             sender.printErr("Command '%s' requires a sub-command", name)
             return CommandDispatchErrorResult(sender, name, rest, CMD_REQUIRES_SUB)
         }
 
-        if ((rest.isEmpty() || cmd.commands.isEmpty()) && commandSelected(cmd)) {
-            val context = cmd.createContext(name, cmd.getParts(sender, rest) ?: return null)
+        if ((rest.isEmpty() || cmd.subManager.isEmpty()) && commandSelected(cmd)) {
             val context = cmd.createContext(name, sender, cmd.getParts(sender, rest) ?: return null)
 
             context.parts.forEach {

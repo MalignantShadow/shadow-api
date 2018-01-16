@@ -9,18 +9,20 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
     private val _params = ArrayList<CommandParameter>()
     private var _extraParam: CommandParameter? = null
 
-    var handler: ((CommandContext<C, S>) -> CommandResult?)? = null
     abstract val subManager: CommandManager<C, S>
 
-    val aliases get () = _aliases.toList()
-    val allAliases get() = listOf(name, *aliases.toTypedArray())
-    val params get() = _params
-    val extraArg get() = _extraArg
     val minArgs get() = params.count { it.isRequired }
     val maxArgs get() = params.size
     val argRange get() = minArgs..maxArgs
-    val isParent get() = !commands.isEmpty()
+    val isParent get() = !subManager.isEmpty()
+
+    val aliases get() = _aliases.toList()
+    val allAliases get() = listOf(name, *_aliases.toTypedArray())
+        val params: List<CommandParameter> get() = _params.toList()
+        val extra get() = _extraParam
+
     private var isHiddenFn: ((S) -> Boolean) = { false }
+    var handler: ((CommandContext<C, S>) -> CommandResult?)? = null
 
     fun command(name: String, desc: String, init: Command<C, S>.() -> Unit) = subManager.command(name, desc, init)
 
@@ -76,8 +78,7 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
     fun hasAlias(alias: String) = alias == name || alias in _aliases
 
     fun conflictsWith(other: Command<*, *>): Boolean {
-        if (hasAlias(other.name)) return true
-        other.aliases.forEach { if (hasAlias(it)) return@conflictsWith true }
+        other.allAliases.forEach { if (hasAlias(it)) return@conflictsWith true }
         return false
     }
 
