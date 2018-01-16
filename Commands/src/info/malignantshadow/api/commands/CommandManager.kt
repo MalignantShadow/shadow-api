@@ -136,7 +136,7 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
             return CommandDispatchErrorResult(sender, name, rest, CMD_NOT_DISPATCHED)
         }
 
-        return cmd.commands.dispatch(sender, rest)
+        return cmd.subManager.dispatch(sender, rest)
     }
 
     open fun getVisible(sender: CommandSender?): List<C> {

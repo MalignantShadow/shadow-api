@@ -11,8 +11,8 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
 
     var handler: ((CommandContext<C, S>) -> CommandResult?)? = null
     var isHidden = false
+    abstract val subManager: CommandManager<C, S>
 
-    abstract val commands: CommandManager<C, S>
     val aliases get () = _aliases.toList()
     val allAliases get() = listOf(name, *aliases.toTypedArray())
     val params get() = _params
@@ -22,7 +22,7 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
     val argRange get() = minArgs..maxArgs
     val isParent get() = !commands.isEmpty()
 
-    fun command(name: String, desc: String, init: Command<C, S>.() -> Unit): Command<C, S> = commands.command(name, desc, init)
+    fun command(name: String, desc: String, init: Command<C, S>.() -> Unit) = subManager.command(name, desc, init)
 
     fun alias(lazyValue: () -> String) {
         alias(lazyValue())
@@ -100,7 +100,7 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
         return commandParts
     }
 
-    fun helpCommand(name: String = "help", aliases: List<String> = listOf("?")) = commands.helpCommand(name, aliases)
+    fun helpCommand(name: String = "help", aliases: List<String> = listOf("?")) = subManager.helpCommand(name, aliases)
 
     abstract fun createContext(prefix: String, sender: S, parts: List<Command.Part>): CommandContext<C, S>
 
