@@ -7,7 +7,7 @@ open class HelpListing(val fullCmd: String, val commands: MutableList<Command<*,
     open fun formatArg(arg: String, required: Boolean) =
             (if (required) "<%s>" else "[%s]").format(arg)
 
-    open fun formatArgs(args: Iterable<CommandArgument>): String =
+    open fun formatArgs(args: Iterable<CommandParameter>): String =
             args.joinToString(" ", transform = { formatArg(it.shownDisplay, it.isRequired) })
 
     open fun formatAliases(aliases: Iterable<String>) = aliases.joinToString("/")
@@ -15,14 +15,14 @@ open class HelpListing(val fullCmd: String, val commands: MutableList<Command<*,
     open fun formatDescription(desc: String) = if (desc.isEmpty()) "" else "- $desc"
 
     open fun formatSimpleCommand(cmd: Command<*, *>): String {
-        val args = ArrayList(cmd.args)
+        val args = ArrayList(cmd.params)
         if (cmd.extraArg != null) args.add(cmd.extraArg)
         return "${formatAliases(cmd.allAliases)} ${formatArgs(args)} ${formatDescription(cmd.desc)}"
     }
 
     open fun formatCommandNested(cmd: Command<*, *>): String {
-        val dummy = ArrayList<CommandArgument>()
-        dummy.add(CommandArgument("command", "The sub-command to run", true))
+        val dummy = ArrayList<CommandParameter>()
+        dummy.add(CommandParameter("command", "The sub-command to run", true))
         return "${formatAliases(cmd.allAliases)} ${formatArgs(dummy)} ${formatDescription(cmd.desc)}"
     }
 

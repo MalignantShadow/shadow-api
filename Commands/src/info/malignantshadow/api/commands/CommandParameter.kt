@@ -3,7 +3,7 @@ package info.malignantshadow.api.commands
 import info.malignantshadow.api.util.parsing.StringTransformers
 
 @CommandDsl
-class CommandArgument(val name: String, val desc: String, var isRequired: Boolean = false) {
+class CommandParameter(val name: String, val desc: String, var isRequired: Boolean = false) {
 
     var display: String = ""
     val shownDisplay get() = if(display.isBlank()) name else display

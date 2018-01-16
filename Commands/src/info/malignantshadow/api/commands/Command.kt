@@ -6,8 +6,8 @@ import info.malignantshadow.api.util.build
 abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, val desc: String) {
 
     private val _aliases = ArrayList<String>()
-    private val _args = ArrayList<CommandArgument>()
-    private var _extraArg: CommandArgument? = null
+    private val _params = ArrayList<CommandParameter>()
+    private var _extraArg: CommandParameter? = null
 
     var handler: ((CommandContext<C, S>) -> CommandResult?)? = null
     var isHidden = false
@@ -15,10 +15,10 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
     abstract val commands: CommandManager<C, S>
     val aliases get () = _aliases.toList()
     val allAliases get() = listOf(name, *aliases.toTypedArray())
-    val args get() = _args
+    val params get() = _params
     val extraArg get() = _extraArg
-    val minArgs get() = args.count { it.isRequired }
-    val maxArgs get() = args.size
+    val minArgs get() = params.count { it.isRequired }
+    val maxArgs get() = params.size
     val argRange get() = minArgs..maxArgs
     val isParent get() = !commands.isEmpty()
 
@@ -45,16 +45,16 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
         aliases.forEach { alias(it) }
     }
 
-    fun arg(name: String, desc: String, required: Boolean = false, init: CommandArgument.() -> Unit) =
-            _args.build(CommandArgument(name, desc, required), init)
+    fun param(name: String, desc: String, required: Boolean = false, init: CommandParameter.() -> Unit) =
+            _params.build(CommandParameter(name, desc, required), init)
 
-    fun args(args: Iterable<CommandArgument>) {
-        _args.clear()
-        _args.addAll(args)
+    fun params(params: Iterable<CommandParameter>) {
+        _params.clear()
+        _params.addAll(params)
     }
 
     fun extra(name: String, desc: String, required: Boolean = false) {
-        _extraArg = CommandArgument(name, desc, required)
+        _extraArg = CommandParameter(name, desc, required)
     }
 
     fun hasAlias(alias: String) = alias == name || alias in _aliases
@@ -75,7 +75,7 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
         var optionalLeft = given - minArgs
         var index = 0
         val commandParts = ArrayList<Command.Part>()
-        args.forEach {
+        params.forEach {
             when {
                 it.isRequired -> commandParts.add(Command.Part(it, parts[index++]))
                 optionalLeft > 0 -> {
@@ -96,7 +96,7 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
 
     abstract fun createContext(prefix: String, parts: List<Command.Part>): CommandContext<C, S>
 
-    class Part(val arg: CommandArgument?, val input: String, isExtra: Boolean = false) {
+    class Part(val arg: CommandParameter?, val input: String, isExtra: Boolean = false) {
 
         val value by lazy { arg?.getValueFrom(input) }
         val isExtra = isExtra || arg == null

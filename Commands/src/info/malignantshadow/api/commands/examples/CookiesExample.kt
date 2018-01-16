@@ -62,11 +62,11 @@ val cookieManager = commandManager {
     command("cookie", "Commands related to cookies") {
         alias("c")
         val bake = command("bake", "Bake cookies") {
-            arg("type", "The type of cookie to eat") {
+            param("type", "The type of cookie to eat") {
                 isRequired()
                 typeOf<CookieType>()
             }
-            arg("amount", "The amount of cookies") {
+            param("amount", "The amount of cookies") {
                 typeOf(StringTransformers.INT)
                 def = 1
             }
@@ -80,12 +80,12 @@ val cookieManager = commandManager {
             }
         }
         command("eat", "Eat cookies") {
-            args(bake.args)
+            params(bake.args)
             handler = ::eatCookie // or a function reference
         }
         command("inventory", "Check the inventory") {
             alias("inv")
-            arg("type", "The type of cookie. Leave blank to see entire inventory") {
+            param("type", "The type of cookie. Leave blank to see entire inventory") {
                 isNullable()
                 typeOf<CookieType>()
             }
