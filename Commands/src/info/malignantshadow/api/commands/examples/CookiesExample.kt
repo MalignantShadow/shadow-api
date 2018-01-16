@@ -80,7 +80,7 @@ val cookieManager = commandManager {
             }
         }
         command("eat", "Eat cookies") {
-            params(bake.args)
+            params(bake.params)
             handler = ::eatCookie // or a function reference
         }
         command("inventory", "Check the inventory") {
