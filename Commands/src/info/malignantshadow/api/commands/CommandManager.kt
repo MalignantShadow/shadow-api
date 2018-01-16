@@ -112,6 +112,7 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
 
         if ((rest.isEmpty() || cmd.commands.isEmpty()) && commandSelected(cmd)) {
             val context = cmd.createContext(name, cmd.getParts(sender, rest) ?: return null)
+            val context = cmd.createContext(name, sender, cmd.getParts(sender, rest) ?: return null)
 
             context.parts.forEach {
                 val arg = it.arg

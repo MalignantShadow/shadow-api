@@ -8,7 +8,7 @@ class SimpleCommand(name: String, desc: String) : Command<SimpleCommand, Command
 
     override val commands = SimpleCommandManager()
 
-    override fun createContext(prefix: String, parts: List<Command.Part>): CommandContext<SimpleCommand, CommandSender> =
-            CommandContext(prefix, this, CommandSender(), parts)
+    override fun createContext(prefix: String, sender: CommandSender, parts: List<Command.Part>): CommandContext<SimpleCommand, CommandSender> =
+            CommandContext(prefix, this, sender, parts)
 
 }

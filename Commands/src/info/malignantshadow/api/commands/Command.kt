@@ -102,7 +102,7 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
 
     fun helpCommand(name: String = "help", aliases: List<String> = listOf("?")) = commands.helpCommand(name, aliases)
 
-    abstract fun createContext(prefix: String, parts: List<Command.Part>): CommandContext<C, S>
+    abstract fun createContext(prefix: String, sender: S, parts: List<Command.Part>): CommandContext<C, S>
 
     class Part(val arg: CommandParameter?, val input: String, isExtra: Boolean = false) {
 
