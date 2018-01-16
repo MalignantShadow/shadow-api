@@ -144,7 +144,7 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
         return commands.filter { filter || !it.isHiddenFor(sender!!) }
     }
 
-    open fun getHelpListing(fullCmd: String, sender: CommandSender?) = HelpListing(fullCmd, getVisible(sender).toMutableList())
+    open fun getHelpListing(fullCmd: String, sender: S?) = HelpListing(fullCmd, getVisible(sender).toMutableList())
 
     open fun commandSelected(command: C): Boolean = true
     open fun commandWillDispatch(context: CommandContext<C, S>) = true
