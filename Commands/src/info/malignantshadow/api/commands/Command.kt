@@ -70,7 +70,7 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
     }
 
     fun extra(name: String, desc: String, required: Boolean = false) {
-        _extraArg = CommandParameter(name, desc, required)
+        _extraParam = CommandParameter(name, desc, required)
     }
 
     fun hasAlias(alias: String) = alias == name || alias in _aliases
