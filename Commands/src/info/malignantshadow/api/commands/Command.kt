@@ -10,7 +10,6 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
     private var _extraParam: CommandParameter? = null
 
     var handler: ((CommandContext<C, S>) -> CommandResult?)? = null
-    var isHidden = false
     abstract val subManager: CommandManager<C, S>
 
     val aliases get () = _aliases.toList()
@@ -21,6 +20,7 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
     val maxArgs get() = params.size
     val argRange get() = minArgs..maxArgs
     val isParent get() = !commands.isEmpty()
+    private var isHiddenFn: ((S) -> Boolean) = { false }
 
     fun command(name: String, desc: String, init: Command<C, S>.() -> Unit) = subManager.command(name, desc, init)
 
@@ -33,7 +33,15 @@ abstract class Command<C : Command<C, S>, S : CommandSender>(val name: String, v
     }
 
     fun isHidden() {
-        isHidden = true
+        isHiddenFn = { true }
+    }
+
+    fun hiddenFor(lazy: ((S) -> Boolean)) {
+        isHiddenFn = lazy
+    }
+
+    fun isHiddenFor(sender: S): Boolean {
+        return isHiddenFn(sender)
     }
 
     fun aliases(lazyValue: () -> Iterable<String>) {
