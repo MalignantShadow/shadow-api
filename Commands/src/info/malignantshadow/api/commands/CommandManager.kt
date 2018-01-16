@@ -139,7 +139,7 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
         return cmd.subManager.dispatch(sender, rest)
     }
 
-    open fun getVisible(sender: CommandSender?): List<C> {
+    fun getVisible(sender: S?): List<C> {
         val filter = sender == null
         return commands.filter { filter || !it.isHidden }
     }
