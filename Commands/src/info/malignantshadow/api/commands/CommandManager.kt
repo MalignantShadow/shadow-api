@@ -57,7 +57,7 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
 
                         it.sender.print("${help.formatFullCommand(fullCmdPath).trim()} ${help.formatSimpleCommand(command)}")
 
-                        command.args.forEach { a ->
+                        command.params.forEach { a ->
                             it.sender.print("  ${help.formatArg(a.shownDisplay, a.isRequired)} ${help.formatDescription(a.desc)}")
                         }
                         return@handler HelpResult(HELP_SENT)
