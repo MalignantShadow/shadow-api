@@ -88,13 +88,12 @@ object ParameterType {
      *
      * @param types The accepted types
      */
-    //TODO: Allow the input to escape commas
     @JvmStatic
     fun listOf(vararg types: ParameterToken<Any?>): (String) -> List<Any?> = { input: String? ->
         if (input == null)
             emptyList()
         else {
-            val split = input.split(",")
+            val split = input.split("(?<!\\\\),")
             val values = ArrayList<Any?>()
             for (i in 0 until split.size) {
                 val str = split[i]
