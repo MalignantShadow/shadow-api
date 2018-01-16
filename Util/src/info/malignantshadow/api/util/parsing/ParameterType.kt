@@ -151,6 +151,30 @@ object ParameterType {
     }
 
     /**
+     * Specify that the input must be one of the given choices (case-sensitive)
+     *
+     * @param choices The available choices
+     * @return a function that will return the choice if it matches, or `null` if there was no match
+     */
+    @JvmStatic
+    fun oneOf(vararg choices: String): ParameterToken<String?> {
+        return oneOf(false, *choices)
+    }
+
+    /**
+     * Specify that the input must be one of the given choices
+     *
+     * @param choices The available choices
+     * @param ignoreCase Whether to ignore casing
+     * @return a function that will return the choice if it matches, or `null` if there was no match
+     */
+    @JvmStatic
+    fun oneOf(ignoreCase: Boolean, vararg choices: String): ParameterToken<String?> {
+        require(!choices.isEmpty()) { "Must specify at least one choice" }
+        return firstMatch(listOf(*choices)) { input, it -> it.equals(input, ignoreCase) }
+    }
+
+    /**
      * Parse the input as an Int representing bitwise flags. The input is parsed as an [arrayOf] `Int`s,
      * using the specified function. The Ints are then bitwise OR'd together.
      *
