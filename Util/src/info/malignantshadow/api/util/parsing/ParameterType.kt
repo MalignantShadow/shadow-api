@@ -18,33 +18,33 @@ object ParameterType {
      * Parse the input as a String. Simply returns the input.
      */
     @JvmField
-    val STRING = { input: String? -> input }
+    val STRING = { input: String -> input }
 
     /**
      * Parse the input as an Int, or null if it can't be parsed as such.
      */
     @JvmField
-    val INT = { input: String? -> input?.toIntOrNull() }
+    val INT = { input: String -> input?.toIntOrNull() }
 
     /**
      * Parse the input as a hexadecimal Int, or null if it can't be parsed as such.
      */
     @JvmField
-    val HEXADECIMAL = { input: String? -> input?.toIntOrNull(16) }
+    val HEXADECIMAL = { input: String -> input?.toIntOrNull(16) }
 
 
     /**
      * Parse the input as an Double, or null if it can't be parsed as such.
      */
     @JvmField
-    val DOUBLE = { input: String? -> input?.toDoubleOrNull() }
+    val DOUBLE = { input: String -> input?.toDoubleOrNull() }
 
     /**
      * Parse the input as an Number, or null if it can't be parsed as such.
      * [INT] will be tried first, otherwise [DOUBLE] will be tried.
      */
     @JvmField
-    val NUMBER: Type<Number?> = { input: String? -> INT(input) ?: DOUBLE(input) }
+    val NUMBER: ParameterToken<Number?> = { input: String -> INT(input) ?: DOUBLE(input) }
 
     /**
      * Parse the input as a Boolean, or null if it can't be parsed as such.
@@ -53,9 +53,8 @@ object ParameterType {
      * * Aside from `false`, `no` and `off` are accepted inputs that evaluate to `false`
      */
     @JvmField
-    val BOOLEAN = { input: String? ->
+    val BOOLEAN = { input: String ->
         when {
-            input == null -> null
             input.equalsAny(true, "yes", "true", "on") -> true
             input.equalsAny(true, "no", "false", "off") -> false
             else -> null
@@ -67,13 +66,13 @@ object ParameterType {
      * functions return `null`, then the input is simply returned.
      */
     @JvmField
-    val PRIMITIVE: Type<Any?> = { input: String? -> BOOLEAN(input) ?: NUMBER(input) ?: input }
+    val PRIMITIVE: ParameterToken<Any?> = { input: String -> BOOLEAN(input) ?: NUMBER(input) ?: input }
 
     /**
      * Parse the input as a [Selector], or null if it can't be parsed as such.
      */
     @JvmField
-    val SELECTOR = { input: String? -> Selector.compile(input) }
+    val SELECTOR = { input: String -> Selector.compile(input) }
 
 
     /**
@@ -82,7 +81,7 @@ object ParameterType {
      * @param transform The transform function to pass to the constructed Pattern
      */
     @JvmStatic
-    fun <R> pattern(transform: Type<R>) = { input: String? -> Pattern(input, transform) }
+    fun <R> pattern(transform: (String?) -> R) = { input: String -> Pattern(input, transform) }
 
     /**
      * Parse the input as an array of any of the given types
@@ -91,7 +90,7 @@ object ParameterType {
      */
     //TODO: Allow the input to escape commas
     @JvmStatic
-    fun arrayOf(vararg types: Type<Any?>): (String?) -> Array<Any?> = { input: String? ->
+    fun arrayOf(vararg types: ParameterToken<Any?>): (String) -> Array<Any?> = { input: String? ->
         if (input == null)
             emptyArray()
         else {
@@ -127,7 +126,7 @@ object ParameterType {
      * @param caseSensitive Whether the names/aliases of the Enum values are matched case-sensitive the input string
      * @return a function that returns an Enum value, or null if no match was found
      */
-    fun <E: Enum<E>> enumValue(values: Iterable<E>, caseSensitive: Boolean = false): Type<E?> =
+    fun <E: Enum<E>> enumValue(values: Iterable<E>, caseSensitive: Boolean = false): ParameterToken<E?> =
             firstMatch(values) { input: String?, it: E ->
                 if (it is Aliasable) {
                     //use the name property of Nameable instead of Enum
@@ -146,7 +145,7 @@ object ParameterType {
      * @return a function that returns the first match
      */
     @JvmStatic
-    fun <T> firstMatch(values: Iterable<T>, predicate: (String?, T) -> Boolean): Type<T?> = label@{ input: String? ->
+    fun <T> firstMatch(values: Iterable<T>, predicate: (String, T) -> Boolean): ParameterToken<T?> = label@{ input: String ->
         values.forEach { if(predicate(input, it)) return@label it }
         null
     }
@@ -159,7 +158,7 @@ object ParameterType {
      * @return a function that returns an Int representing bitwise flags
      */
     @JvmStatic
-    fun bitwiseFlag(flagType: Type<Int?>): (String?) -> Int = label@ { input: String? ->
+    fun bitwiseFlag(flagType: ParameterToken<Int?>): (String) -> Int = label@ { input: String ->
         var bits = 0
         val values = arrayOf(flagType)(input)
         values.forEach { if (it != null) bits = bits or (it as Int) }
