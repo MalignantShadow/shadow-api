@@ -24,10 +24,10 @@ the `message` parameter having a value of `This is my message`.
   [the ParameterType object](../Util/src/info/malignantshadow/api/util/parsing/ParameterType.kt#L15).
 * A good portion of errors are handled already, you only need to worry about errors
 specific to your application. Included error handling includes
-  * a [flag](src/info/malignantshadow/api/commands/CommandManager.kt#L118)
-    or [parameter](src/info/malignantshadow/api/commands/CommandManager.kt#L122)
+  * a [flag](src/info/malignantshadow/api/commands/CommandManager.kt#L218)
+    or [parameter](src/info/malignantshadow/api/commands/CommandManager.kt#L222)
     with invalid input
   * a [missing flag](src/info/malignantshadow/api/commands/parse/CommandParser.kt#L106)
-  * an [exception ocurring](src/info/malignantshadow/api/commands/CommandManager.kt#L133)
+  * an [exception ocurring](src/info/malignantshadow/api/commands/CommandManager.kt#L233)
    while the command is running
 * Simple indication that a command should show help if a flag is present. i.e. `mail --help` or `mail -?`
