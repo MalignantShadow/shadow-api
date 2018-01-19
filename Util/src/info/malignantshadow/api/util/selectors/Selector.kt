@@ -19,7 +19,7 @@ open class Selector(val name: String, var args: ArrayList<SelectorArgument>) : I
     fun getAll(name: String) = getAll(name, ParameterType.STRING)
 
     @JvmOverloads
-    fun <R> getAll(name: String, type: (String?) -> R?, max: Int = -1): ArrayList<R?>? {
+    fun <R> getAll(name: String, type: (String) -> R?, max: Int = -1): ArrayList<R?>? {
         val arg = get(name) ?: return null
 
         val arr = ArrayList<R?>()
@@ -34,7 +34,7 @@ open class Selector(val name: String, var args: ArrayList<SelectorArgument>) : I
     }
 
     fun getOne(name: String) = getOne(name, ParameterType.STRING)
-    fun <R> getOne(name: String, type: (String?) -> R?) = getAll(name, type, 1)?.getOrNull(0)
+    fun <R> getOne(name: String, type: (String) -> R?) = getAll(name, type, 1)?.getOrNull(0)
 
     fun isSet(name: String) = get(name) != null
 
