@@ -163,6 +163,11 @@ open class Tokenizer(src: String, val skipWhitespace: Boolean = true) {
     private var _workingSrc = src
 
     /**
+     * The rest of the string that has yet to be tokenized
+     */
+    val rest get() = _workingSrc
+
+    /**
      * The source string for this Tokenizer to use.
      *
      * Setting this value will clear previous tokens.
