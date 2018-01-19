@@ -6,6 +6,12 @@ import info.malignantshadow.api.commands.dispatch.CommandSource
 import info.malignantshadow.api.commands.parse.CommandParseException
 import info.malignantshadow.api.commands.parse.CommandParser
 
+/**
+ * Represents a command manager. A command manager is in charge of selecting which command to dispatch
+ * when a [CommandSource] runs a command. The selected command and its input are given to a [CommandParser],
+ * whose tokens are used to create a context. This context is then given to a handler, who determines the result
+ * of the command.
+ */
 class CommandManager(
         val commands: List<CommandSpec>,
         val onSelect: ((CommandSource, CommandSpec) -> Boolean)?,
@@ -19,8 +25,20 @@ class CommandManager(
         const val HELP_UNKNOWN_COMMAND = 1
         const val HELP_PAGE_NOT_FOUND = 2
 
+        /**
+         * Indicates that a command (the key) could not be found.
+         */
         const val CMD_NOT_FOUND = 0
+
+        /**
+         * Indicates that a command (the key) requires a sub-command, but the source
+         * attempted to run the command anyway.
+         */
         const val CMD_REQUIRES_SUB = 1
+
+        /**
+         * Indicates that a given input (the key) is invalid.
+         */
         const val CMD_INVALID_INPUT = 2
 
     }
@@ -38,12 +56,100 @@ class CommandManager(
         }
     }
 
-    data class CommandDispatchErrorResult(val source: CommandSource, val key: String, val type: Int) : CommandResult
-    data class CommandNotDispatchedResult(val source: CommandSource, val cmd: CommandSpec) : CommandResult
-    data class ExceptionInCommandBodyResult(val source: CommandSource, val context: CommandContext, val exception: Exception) : CommandResult
-    data class CommandParseErrorResult(val source: CommandSource, val cmd: CommandSpec, val message: String) : CommandResult
+    /**
+     * Represents that an error occurred sometime in the dispatching process.
+     */
+    data class CommandDispatchErrorResult(
 
+            /**
+             * The source of the command.
+             */
+            val source: CommandSource,
+
+            /**
+             * The key associated with the error. Usually the command's name.
+             */
+            val key: String,
+
+            /**
+             * The error type one of [CMD_NOT_FOUND], [CMD_INVALID_INPUT],
+             * or [CMD_REQUIRES_SUB]
+             */
+            val type: Int
+    ) : CommandResult
+
+    /**
+     * Represents that a command was not dispatched because either [onSelect] or [commandWillDispatch] prevented it.
+     */
+    data class CommandNotDispatchedResult(
+
+            /**
+             * The source of the command.
+             */
+            val source: CommandSource,
+
+            /**
+             * The command.
+             */
+            val cmd: CommandSpec
+    ) : CommandResult
+
+    /**
+     * Represents that an (uncaught) exception occurred in the command's handler.
+     */
+    data class ExceptionInCommandBodyResult(
+
+            /**
+             * The source of the command.
+             */
+            val source: CommandSource,
+
+            /**
+             * The context of the command.
+             */
+            val context: CommandContext,
+
+            /**
+             * The exception that was thrown.
+             */
+            val exception: Exception
+    ) : CommandResult
+
+    /**
+     * Represents that a [CommandParseException] was thrown while a command's input was being parsed.
+     */
+    data class CommandParseErrorResult(
+
+            /**
+             * The source of the command.
+             */
+            val source: CommandSource,
+
+            /**
+             * The command.
+             */
+            val cmd: CommandSpec,
+
+            /**
+             * The exception's message
+             */
+            val message: String
+    ) : CommandResult
+
+    /**
+     * Get the commands that should be visible in the help listing shown to `source`.
+     *
+     * @param source The source of a command
+     * @return a List of visible commands
+     */
     fun getVisibleChildren(source: CommandSource) = commands.filter { !it.isHiddenFor(source) }
+
+    /**
+     * Get the commands that `source` can send.
+     *
+     * @param source The source of a command
+     * @return a List of sendable commands
+     */
     fun getSendableChildren(source: CommandSource) = commands.filter { it.isSendableBy(source) }
 
     private fun notFound(source: CommandSource, name: String): CommandDispatchErrorResult {
@@ -56,6 +162,13 @@ class CommandManager(
         return CommandDispatchErrorResult(source, cmd.name, CMD_REQUIRES_SUB)
     }
 
+    /**
+     * Dispatch a command.
+     *
+     * @param source The source of the command
+     * @param command The command string
+     * @return the result of the command, or an appropriate result if an error or exception occurred.
+     */
     fun dispatch(source: CommandSource, command: String): CommandResult? {
         require(!command.isBlank()) { "Command string cannot be blank" }
         val tokenizer = CommandParser.getTokenizer(command)

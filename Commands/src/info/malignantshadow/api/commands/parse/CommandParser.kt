@@ -5,13 +5,39 @@ import info.malignantshadow.api.commands.CommandSpec
 import info.malignantshadow.api.commands.build.CommandParameterBuilder
 import info.malignantshadow.api.util.parsing.Tokenizer
 
+/**
+ * Represents an object that parses command input
+ *
+ * @param cmd The command whose input is being parsed
+ * @param input The input to the command
+ */
 class CommandParser(val cmd: CommandSpec, val input: String) {
 
     companion object {
 
+        /**
+         * Represents a string contained in quotes. Used by the
+         * [Tokenizer] for identification of tokens.
+         */
         const val QUOTED_STRING = 0
+
+        /**
+         * Represents a long flag ('--flag'). Used by the
+         * [Tokenizer] for identification of tokens.
+         */
         const val LONG_FLAG = 1
+
+        /**
+         * Represents a short flag ('-f'). Used by the
+         * [Tokenizer] for identification of tokens.
+         */
+
         const val SHORT_FLAG = 2
+
+        /**
+         * Represents everything else. Used by the
+         * [Tokenizer] for identification of tokens.
+         */
         const val OTHER = 4
 
         fun getTokenizer(input: String): Tokenizer {
@@ -27,6 +53,11 @@ class CommandParser(val cmd: CommandSpec, val input: String) {
     }
 
     private val tokenizer = getTokenizer(input)
+
+    /**
+     * The parsed elements. Parsing takes places as soon as the value of this property
+     * is called upon.
+     */
     val elements: List<CommandElement> by lazy {
         val elements = ArrayList<CommandElement>()
 

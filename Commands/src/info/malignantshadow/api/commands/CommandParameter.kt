@@ -3,6 +3,12 @@ package info.malignantshadow.api.commands
 import info.malignantshadow.api.util.parsing.ParameterType
 
 class CommandParameter(
+
+        /**
+         * The name. A value starting with a dash (`-`) indicates that this parameter is
+         * considered a flag. If there is more than one character after the dash, it is considered
+         * a 'long' flag, one character marks it as a 'short' flag
+         */
         val name: String,
         val desc: String,
         val display: String,
