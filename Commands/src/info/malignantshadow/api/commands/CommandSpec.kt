@@ -39,10 +39,7 @@ class CommandSpec(
          */
         val handler: ((CommandContext) -> CommandResult?)?,
 
-        /**
-         * The child commands
-         */
-        val children: List<CommandSpec>,
+        children: List<CommandSpec>,
 
         /**
          * A function to determine whether this command can be run via the given source.
@@ -54,7 +51,7 @@ class CommandSpec(
          * shown to the given command source
          */
         val isHiddenFor: (CommandSource) -> Boolean
-) {
+) : CommandContainer(children) {
 
     /**
      * All aliases of this command, including its name.
@@ -97,21 +94,5 @@ class CommandSpec(
      * @param alias The alias
      */
     fun hasAlias(alias: String) = allAliases.firstOrNull { it.equals(alias, true) } != null
-
-    /**
-     * Get the commands that should be visible in the help listing shown to `source`.
-     *
-     * @param source The source of a command
-     * @return a List of visible commands
-     */
-    fun getVisibleChildren(source: CommandSource) = children.filter { !it.isHiddenFor(source) }
-
-    /**
-     * Get the commands that `source` can send.
-     *
-     * @param source The source of a command
-     * @return a List of sendable commands
-     */
-    fun getSendableChildren(source: CommandSource) = children.filter { it.handler != null && it.isSendableBy(source) }
 
 }

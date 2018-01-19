@@ -13,11 +13,12 @@ import info.malignantshadow.api.commands.parse.CommandParser
  * of the command.
  */
 class CommandManager(
-        val commands: List<CommandSpec>,
+        commands: List<CommandSpec>,
+
         val onSelect: ((CommandSource, CommandSpec) -> Boolean)?,
         val commandWillDispatch: ((CommandContext) -> Boolean)?,
         val commandDidDispatch: ((CommandContext, CommandResult?) -> Unit)?
-) {
+) : CommandContainer(commands) {
 
     companion object {
 
@@ -136,22 +137,6 @@ class CommandManager(
             val message: String
     ) : CommandResult
 
-    /**
-     * Get the commands that should be visible in the help listing shown to `source`.
-     *
-     * @param source The source of a command
-     * @return a List of visible commands
-     */
-    fun getVisibleChildren(source: CommandSource) = commands.filter { !it.isHiddenFor(source) }
-
-    /**
-     * Get the commands that `source` can send.
-     *
-     * @param source The source of a command
-     * @return a List of sendable commands
-     */
-    fun getSendableChildren(source: CommandSource) = commands.filter { it.isSendableBy(source) }
-
     private fun notFound(source: CommandSource, name: String): CommandDispatchErrorResult {
         source.printErr("Command '%s' not found", name)
         return CommandDispatchErrorResult(source, name, CMD_NOT_FOUND)
@@ -178,7 +163,7 @@ class CommandManager(
             return CommandDispatchErrorResult(source, token.match, CMD_INVALID_INPUT)
         }
 
-        var cmd = commands[token.match] ?: return notFound(source, token.match)
+        var cmd = children[token.match] ?: return notFound(source, token.match)
         while (true) {
             if (!cmd.isParent) // cmd has no children, therefore has a handler
                 return dispatch(source, cmd, tokenizer.rest)
