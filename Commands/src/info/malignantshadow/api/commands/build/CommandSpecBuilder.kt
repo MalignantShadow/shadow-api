@@ -24,10 +24,6 @@ class CommandSpecBuilder(val name: String, val desc: String) {
         return aliases.firstOrNull { other.hasAlias(it) } != null
     }
 
-    init {
-        checkAlias(name)
-    }
-
     fun child(name: String, desc: String, init: CommandSpecBuilder.() -> Unit) : CommandSpec {
         val child = build(CommandSpecBuilder(name, desc), init).build()
         child(child)
