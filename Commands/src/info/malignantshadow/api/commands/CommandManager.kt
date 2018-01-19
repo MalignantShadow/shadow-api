@@ -15,8 +15,19 @@ import info.malignantshadow.api.commands.parse.CommandParser
 class CommandManager(
         commands: List<CommandSpec>,
 
+        /**
+         * Indicates whether a command's input should be parsed.
+         */
         val onSelect: ((CommandSource, CommandSpec) -> Boolean)?,
+
+        /**
+         * Indicates whether a command should dispatch after it's input has been parsed.
+         */
         val commandWillDispatch: ((CommandContext) -> Boolean)?,
+
+        /**
+         * Called after a command has been dispatched successfully.
+         */
         val commandDidDispatch: ((CommandContext, CommandResult?) -> Unit)?
 ) : CommandContainer(commands) {
 
