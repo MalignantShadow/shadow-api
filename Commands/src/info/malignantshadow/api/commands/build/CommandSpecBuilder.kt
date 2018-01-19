@@ -31,7 +31,7 @@ class CommandSpecBuilder(
     private var hiddenFor: (CommandSource) -> Boolean = { false }
 
     private fun conflictsWith(other: CommandSpec): Boolean {
-        if(other.hasAlias(name)) return true
+        if (other.hasAlias(name)) return true
         return aliases.firstOrNull { other.hasAlias(it) } != null
     }
 
@@ -108,7 +108,7 @@ class CommandSpecBuilder(
      * @see CommandParameter.desc
      * @see CommandParameter.display
      */
-    fun param(name: String, desc: String, display: String = "", init: CommandParameterBuilder.() -> Unit) : CommandParameter {
+    fun param(name: String, desc: String, display: String = "", init: CommandParameterBuilder.() -> Unit): CommandParameter {
         val param = build(CommandParameterBuilder(name, desc, display), init).build()
         param(param)
         return param
