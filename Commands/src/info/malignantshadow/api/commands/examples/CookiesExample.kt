@@ -53,7 +53,7 @@ val manager = commandManager {
                 typeOf(ParameterType.STRING)
             }
             param("value", "A value") {
-                def("Tits and ass")
+                def("")
             }
             handler {
                 it.source.print("Input:")
