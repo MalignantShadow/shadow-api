@@ -65,11 +65,11 @@ class CommandManagerBuilder {
         commandDidDispatch = fn
     }
 
-    internal fun build() : CommandManager = CommandManager(commands, onSelect, commandWillDispatch, commandDidDispatch)
+    internal fun build(): CommandManager = CommandManager(commands, onSelect, commandWillDispatch, commandDidDispatch)
 }
 
 /**
  * Build a CommandManager object.
  */
-fun commandManager(init: CommandManagerBuilder.() -> Unit) : CommandManager =
+fun commandManager(init: CommandManagerBuilder.() -> Unit): CommandManager =
         build(CommandManagerBuilder(), init).build()
