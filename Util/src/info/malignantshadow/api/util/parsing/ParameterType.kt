@@ -24,20 +24,20 @@ object ParameterType {
      * Parse the input as an Int, or null if it can't be parsed as such.
      */
     @JvmField
-    val INT = { input: String -> input?.toIntOrNull() }
+    val INT = { input: String -> input.toIntOrNull() }
 
     /**
      * Parse the input as a hexadecimal Int, or null if it can't be parsed as such.
      */
     @JvmField
-    val HEXADECIMAL = { input: String -> input?.toIntOrNull(16) }
+    val HEXADECIMAL = { input: String -> input.toIntOrNull(16) }
 
 
     /**
      * Parse the input as an Double, or null if it can't be parsed as such.
      */
     @JvmField
-    val DOUBLE = { input: String -> input?.toDoubleOrNull() }
+    val DOUBLE = { input: String -> input.toDoubleOrNull() }
 
     /**
      * Parse the input as an Number, or null if it can't be parsed as such.
