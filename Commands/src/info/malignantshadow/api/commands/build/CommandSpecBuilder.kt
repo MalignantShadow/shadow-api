@@ -167,11 +167,14 @@ class CommandSpecBuilder(
      *
      * @param display The display
      * @param desc The description
+     * @param required Whether extra arguments are required. Default is `false`
      *
      * @see CommandSpec.extra
      */
-    fun extra(display: String, desc: String) {
-        extra = CommandParameterBuilder(display, desc, "").build()
+    fun extra(display: String, desc: String, required: Boolean = false) {
+        extra = build(CommandParameterBuilder(display, desc, "")) {
+            isRequired(required)
+        }.build()
     }
 
     /**
