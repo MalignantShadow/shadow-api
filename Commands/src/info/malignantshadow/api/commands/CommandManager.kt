@@ -25,6 +25,19 @@ class CommandManager(
 
     }
 
+    init {
+        commands.forEach {
+            commands.forEach loop@{ other ->
+                if(it === other)
+                    return@loop // continue
+
+                it.allAliases.forEach { alias ->
+                    check(!other.hasAlias(alias)) { "More than one command with the alias '$alias'" }
+                }
+            }
+        }
+    }
+
     data class CommandDispatchErrorResult(val source: CommandSource, val key: String, val type: Int) : CommandResult
     data class CommandNotDispatchedResult(val source: CommandSource, val cmd: CommandSpec) : CommandResult
     data class ExceptionInCommandBodyResult(val source: CommandSource, val context: CommandContext, val exception: Exception) : CommandResult
