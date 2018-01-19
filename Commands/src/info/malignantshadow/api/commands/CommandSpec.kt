@@ -71,7 +71,7 @@ class CommandSpec(
     /**
      * Indicates whether this command has any children
      */
-    val isParent = !children.isEmpty()
+    val isParent = children.isNotEmpty()
 
     /**
      * The minimum amount of arguments that a source must supply this command
@@ -88,7 +88,7 @@ class CommandSpec(
             check(!it.startsWith("-")) { "A command cannot have an alias that starts with '-' (given: '$it')" }
             check(Regex("\\s") !in it) { "A command cannot have whitespace in any of its aliases" }
         }
-        check(handler != null || !children.isEmpty()) {
+        check(handler != null || children.isNotEmpty()) {
             "Command '$name' is empty - a command must have a handler or at least one child command"
         }
     }
