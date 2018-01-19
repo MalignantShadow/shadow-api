@@ -11,7 +11,7 @@ import info.malignantshadow.api.util.build
 class CommandManagerBuilder {
 
     private val commands = ArrayList<CommandSpec>()
-    private var onSelect: ((CommandSpec) -> Boolean)? = null
+    private var onSelect: ((CommandSource, CommandSpec) -> Boolean)? = null
     private var commandWillDispatch: ((CommandContext) -> Boolean)? = { true }
     private var commandDidDispatch: ((CommandContext, CommandResult?) -> Unit)? = null
 
@@ -21,7 +21,7 @@ class CommandManagerBuilder {
         return command
     }
 
-    fun onSelect(fn: (CommandSpec) -> Boolean) {
+    fun onSelect(fn: (CommandSource, CommandSpec) -> Boolean) {
         onSelect = fn
     }
 

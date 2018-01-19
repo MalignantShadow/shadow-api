@@ -8,7 +8,7 @@ import info.malignantshadow.api.commands.parse.CommandParser
 
 class CommandManager(
         val commands: List<CommandSpec>,
-        val onSelect: ((CommandSpec) -> Boolean)?,
+        val onSelect: ((CommandSource, CommandSpec) -> Boolean)?,
         val commandWillDispatch: ((CommandContext) -> Boolean)?,
         val commandDidDispatch: ((CommandContext, CommandResult?) -> Unit)?
 ) {
@@ -89,7 +89,7 @@ class CommandManager(
     }
 
     private fun dispatch(source: CommandSource, cmd: CommandSpec, rest: String): CommandResult? {
-        if (onSelect?.invoke(cmd) == false)
+        if (onSelect?.invoke(source, cmd) == false)
             return CommandNotDispatchedResult(source, cmd)
 
         val ctx = try {
