@@ -19,11 +19,6 @@ class CommandSpecBuilder(val name: String, val desc: String) {
     private var handler: ((CommandContext) -> CommandResult?)? = null
     private var hiddenFor: (CommandSource) -> Boolean = { false }
 
-    private fun checkAlias(alias: String) {
-        require(!name.startsWith("-")) { "name/alias cannot start with '-' (\"$alias\" given)" }
-        require(Regex("\\s") !in alias) { "name/alias cannot contain whitespace" }
-    }
-
     private fun conflictsWith(other: CommandSpec): Boolean {
         if(other.hasAlias(name)) return true
         return aliases.firstOrNull { other.hasAlias(it) } != null
@@ -87,7 +82,6 @@ class CommandSpecBuilder(val name: String, val desc: String) {
 
     fun alias(alias: String) {
         require(alias !in aliases) { "Command already has alias '$alias'" }
-        checkAlias(alias)
         aliases.add(alias)
     }
 
