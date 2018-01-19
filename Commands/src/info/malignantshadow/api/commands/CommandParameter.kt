@@ -25,6 +25,11 @@ class CommandParameter(
     val isFlag = name.startsWith("-")
     val isLongFlag = isFlag && name.length > 2
     val fullName = if(isFlag && isLongFlag) "-$name" else name
+    val shownDisplay = when {
+        isFlag -> fullName
+        display.isBlank() -> name
+        else -> display
+    }
 
     fun getValueFrom(input: String) =
             if(input.isBlank() || types.isEmpty()) def else ParameterType.firstMatch(types)(input)
