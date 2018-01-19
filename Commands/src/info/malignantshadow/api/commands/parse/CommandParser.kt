@@ -75,7 +75,7 @@ class CommandParser(val cmd: CommandSpec, val input: String) {
         val unnamedParams = cmd.params.filter { !it.isFlag }
         val min = cmd.minArgs
         if (unnamed.size < min)
-            throw CommandParseException(cmd, "Expected at least $min arguments, received ${unnamed.size}")
+            throw CommandParseException(cmd, "Expected at least $min non-flag arguments, received ${unnamed.size}")
         val argElements = ArrayList<CommandElement>()
         var optionalLeft = unnamed.size - min
         var index = 0
