@@ -137,6 +137,20 @@ object ParameterType {
             }
 
     /**
+     * Parse the input by returning the first parameter type that doesn't return null
+     *
+     * @param types The available parameter types
+     * @return a function that returns the first match
+     */
+    fun firstMatch(types: Iterable<(String) -> Any?>) : ParameterToken<Any?> = label@{ input: String ->
+        types.forEach {
+            val v = it(input)
+            if(v != null) return@label v
+        }
+        null
+    }
+
+    /**
      * Parse the input by returning the first match of the specified values, given the specified predicate
      *
      * @param values The available values

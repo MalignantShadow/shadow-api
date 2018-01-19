@@ -2,47 +2,25 @@ package info.malignantshadow.api.commands
 
 import info.malignantshadow.api.util.parsing.ParameterType
 
-@CommandDsl
-class CommandParameter(val name: String, val desc: String, var isRequired: Boolean = false) {
+class CommandParameter(
+        val name: String,
+        val desc: String,
+        val display: String,
+        val types: List<(String) -> Any?>,
+        val isRequired: Boolean,
+        val isNullable: Boolean,
+        val def: Any?
+) {
 
-    var display: String = ""
-    val shownDisplay get() = if(display.isBlank()) name else display
-    val types = ArrayList<(String) -> Any?>()
-    var def: Any? = null
-    var isNullable = false
-
-    fun shouldUseDefault(input: String?) = input == null || input.isBlank()
-
-    fun typeOf(type: (String) -> Any?) {
-        types.add(type)
+    init {
+        check(!isNullable || def != null) { "Parameter requires a non-null value but the default value is null" }
     }
 
-    fun setTypes(types: Iterable<(String) -> Any?>) {
-        this.types.clear()
-        typeOf(types)
-    }
+    val isFlag = name.startsWith("-")
+    val isLongFlag = isFlag && name.length > 2
+    val fullName = if(isFlag && isLongFlag) "-$name" else name
 
-    fun typeOf(types: Iterable<(String) -> Any?>) {
-        this.types.addAll(types)
-    }
-
-    inline fun <reified E: Enum<E>> typeOf(caseSensitive: Boolean = false) {
-        types.add(ParameterType.enumValue<E>())
-    }
-
-
-    fun isNullable() { isNullable = true }
-    fun isRequired() { isRequired = true }
-
-    fun getValueFrom(input: String): Any? {
-        if(shouldUseDefault(input) || types.isEmpty()) return def
-
-        types.forEach {
-            val value = it(input)
-            if(value != null) return@getValueFrom value
-        }
-
-        return def
-    }
+    fun getValueFrom(input: String) =
+            if(input.isBlank() || types.isEmpty()) def else ParameterType.firstMatch(types)(input)
 
 }

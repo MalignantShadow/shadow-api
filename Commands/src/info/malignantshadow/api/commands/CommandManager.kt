@@ -1,12 +1,20 @@
 package info.malignantshadow.api.commands
 
-import info.malignantshadow.api.util.build
-import info.malignantshadow.api.util.parsing.Tokenizer
+import info.malignantshadow.api.commands.dispatch.CommandContext
+import info.malignantshadow.api.commands.dispatch.CommandResult
+import info.malignantshadow.api.commands.dispatch.CommandSource
+import info.malignantshadow.api.commands.parse.CommandParseException
+import info.malignantshadow.api.commands.parse.CommandParser
 
-@CommandDsl
-abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
+class CommandManager(
+        val commands: List<CommandSpec>,
+        val onSelect: ((CommandSpec) -> Boolean)?,
+        val commandWillDispatch: ((CommandContext) -> Boolean)?,
+        val commandDidDispatch: ((CommandContext, CommandResult?) -> Unit)?
+) {
 
     companion object {
+
         const val HELP_SENT = 0
         const val HELP_UNKNOWN_COMMAND = 1
         const val HELP_PAGE_NOT_FOUND = 2
@@ -14,145 +22,99 @@ abstract class CommandManager<C : Command<C, S>, S : CommandSender> {
         const val CMD_NOT_FOUND = 0
         const val CMD_REQUIRES_SUB = 1
         const val CMD_INVALID_INPUT = 2
-        const val CMD_EXCEPTION_IN_BODY = 3
-        const val CMD_NOT_DISPATCHED = 4
+
     }
 
-    data class HelpResult(val result: Int, val data: Any? = null) : CommandResult
+    data class CommandDispatchErrorResult(val source: CommandSource, val key: String, val type: Int) : CommandResult
+    data class CommandNotDispatchedResult(val source: CommandSource, val cmd: CommandSpec) : CommandResult
+    data class ExceptionInCommandBodyResult(val source: CommandSource, val context: CommandContext, val exception: Exception) : CommandResult
+    data class CommandParseErrorResult(val source: CommandSource, val cmd: CommandSpec, val message: String) : CommandResult
 
-    inner class CommandDispatchErrorResult(sender: S, cmd: String, args: List<String>, error: Int) : CommandResult
+    fun getVisibleChildren(source: CommandSource) = commands.filter { !it.isHiddenFor(source) }
+    fun getSendableChildren(source: CommandSource) = commands.filter { it.isSendableBy(source) }
 
-    private val _commands = ArrayList<C>()
-
-    val commands get() = _commands.toList()
-    val size = _commands.size
-
-    fun isEmpty() = _commands.isEmpty()
-
-    abstract fun createCommand(name: String, desc: String): C
-
-    fun command(name: String, desc: String, init: C.() -> Unit): C {
-        val cmd = build(createCommand(name, desc), init)
-        add(cmd)
-        return cmd
+    private fun notFound(source: CommandSource, name: String): CommandDispatchErrorResult {
+        source.printErr("Command '%s' not found", name)
+        return CommandDispatchErrorResult(source, name, CMD_NOT_FOUND)
     }
 
-    fun helpCommand(name: String = "help", aliases: List<String> = listOf("?")) {
-        val cmd = build(createCommand(name, "View help")) {
-            aliases(aliases)
-            handler = handler@ {
-                val split = it.prefix.split("\\s+")
-                val fullCmdPath = if (split.isEmpty()) "" else split.slice(0 until split.lastIndex).joinToString(" ")
-                var page = 1
-                val help = this@CommandManager.getHelpListing(fullCmdPath, it.sender)
-                val arg = it["arg"]
-                if (arg != null) {
-                    if (arg is Number) page = arg.toInt()
-                    else {
-                        val cmdName = arg as String
-                        val command = this@CommandManager[cmdName]
-                        if (command == null) {
-                            it.sender.printErr("Sub-command with the name/alias '%s' does not exist", cmdName)
-                            return@handler HelpResult(HELP_UNKNOWN_COMMAND, cmdName)
-                        }
+    private fun requiresSub(source: CommandSource, cmd: CommandSpec) : CommandDispatchErrorResult {
+        source.printErr("Command '%s' requires a sub-command", cmd.name)
+        return CommandDispatchErrorResult(source, cmd.name, CMD_REQUIRES_SUB)
+    }
 
-                        it.sender.print("${help.formatFullCommand(fullCmdPath).trim()} ${help.formatSimpleCommand(command)}")
-
-                        command.params.forEach { a ->
-                            it.sender.print("  ${help.formatArg(a.shownDisplay, a.isRequired)} ${help.formatDescription(a.desc)}")
-                        }
-                        return@handler HelpResult(HELP_SENT)
-                    }
-                }
-
-                val shownHelp = help.getHelp(page)
-                if (shownHelp == null) {
-                    it.sender.printErr("Page %d does not exist", page)
-                    return@handler HelpResult(HELP_PAGE_NOT_FOUND, page)
-                }
-
-                shownHelp.forEach { s -> it.sender.print(s) }
-                return@handler HelpResult(HELP_SENT)
-            }
+    fun dispatch(source: CommandSource, command: String): CommandResult? {
+        require(!command.isBlank()) { "Command string cannot be blank" }
+        val tokenizer = CommandParser.getTokenizer(command)
+        var token = tokenizer.next() // There should be a token if the string isn't blank
+        if (token!!.type != CommandParser.OTHER) {
+            source.printErr("Expected a command name, received: %s", token.match)
+            return CommandDispatchErrorResult(source, token.match, CMD_INVALID_INPUT)
         }
-        add(cmd)
-    }
 
-    fun add(command: C) {
-        _commands.add(command)
-    }
+        var cmd = commands[token.match] ?: return notFound(source, token.match)
+        while (true) {
+            if (!cmd.isParent) // cmd has no children, therefore has a handler
+                return dispatch(source, cmd, tokenizer.rest)
 
-    operator fun get(alias: String): C? = _commands.firstOrNull { it.hasAlias(alias) }
-
-    fun dispatch(sender: S, fullCmd: String): CommandResult? {
-        require(Regex("[\\n\\r\\f]") !in fullCmd) { "command string cannot contain newline characters" }
-        val tokenizer = Tokenizer(fullCmd)
-        tokenizer.addTokenType(Tokenizer.string(), 0)
-        tokenizer.addTokenType("\\S+", 1)
-        var token = tokenizer.next()
-        val parts = ArrayList<String>()
-        while (token != null) {
-            parts.add(if (token.type == 0) token.match.substring(1..token.match.length) else token.match)
             token = tokenizer.next()
+            if (token == null || token.type != CommandParser.OTHER)
+                return if (cmd.handler == null)
+                    requiresSub(source, cmd)
+                else
+                    dispatch(source, cmd, "${token?.match ?: ""} ${tokenizer.rest}")
+
+            val newCmd = cmd.children[token.match]
+            if (newCmd == null)
+                return if (cmd.handler == null) {
+                    requiresSub(source, cmd)
+                } else
+                    dispatch(source, cmd, "${token.match} ${tokenizer.rest}")
+            else
+                cmd = newCmd
         }
-        return dispatch(sender, parts)
     }
 
-    fun dispatch(sender: S, fullCmd: List<String>): CommandResult? {
-        require(!fullCmd.isEmpty()) { "Command cannot be empty" }
-        val name = fullCmd[0]
-        val cmd = get(name)
-        val rest = fullCmd.slice(1..fullCmd.lastIndex)
-        if (cmd == null) {
-            sender.printErr("Command '%s' not found", name)
-            return CommandDispatchErrorResult(sender, name, rest, CMD_NOT_FOUND)
+    private fun dispatch(source: CommandSource, cmd: CommandSpec, rest: String): CommandResult? {
+        if (onSelect?.invoke(cmd) == false)
+            return CommandNotDispatchedResult(source, cmd)
+
+        val ctx = try {
+            CommandContext(cmd, source, CommandParser(cmd, rest).elements)
+        } catch (e: CommandParseException) {
+            source.print(e.message)
+            return CommandParseErrorResult(source, cmd, e.message)
         }
 
-        if (rest.isEmpty() && !cmd.isParent && cmd.handler == null) {
-            sender.printErr("Command '%s' requires a sub-command", name)
-            return CommandDispatchErrorResult(sender, name, rest, CMD_REQUIRES_SUB)
-        }
-
-        if ((rest.isEmpty() || cmd.subManager.isEmpty()) && commandSelected(cmd)) {
-            val context = cmd.createContext(name, sender, cmd.getParts(sender, rest) ?: return null)
-
-            context.parts.forEach {
-                val arg = it.arg
-                if (arg != null && arg.isRequired && !arg.isNullable && it.value == null) {
-                    sender.printErr("Invalid input for argument '%s': \"%s\"", arg.shownDisplay, it.input)
-                    return@dispatch CommandDispatchErrorResult(sender, name, rest, CMD_INVALID_INPUT)
+        ctx.args.forEach {
+            val param = it.key!!
+            if(param.isFlag) {
+                val required = param.isRequired && !param.types.isEmpty()
+                if(required && !param.isNullable && it.value == null) {
+                    source.printErr("Invalid input for flag '%s' - '%s'", param.name.substring(1), it.input)
+                    return CommandDispatchErrorResult(source, ctx.cmd.name, CMD_INVALID_INPUT)
                 }
+            } else if(param.isRequired && !param.isNullable && it.value == null) {
+                source.printErr("Invalid input for parameter '%s' - '%s'", param.name, it.input)
+                return CommandDispatchErrorResult(source, ctx.cmd.name, CMD_INVALID_INPUT)
             }
-
-            if (commandWillDispatch(context)) {
-                val result = try {
-                    context.dispatchSelf()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    sender.printErr("An error occurred while running this command")
-                    CommandDispatchErrorResult(sender, name, rest, CMD_EXCEPTION_IN_BODY)
-                }
-                commandDidDispatch(context)
-                return result
-            }
-            return CommandDispatchErrorResult(sender, name, rest, CMD_NOT_DISPATCHED)
         }
 
-        return cmd.subManager.dispatch(sender, rest)
+        if (commandWillDispatch?.invoke(ctx) == true) {
+            return try {
+                val result = ctx.cmd.handler!!(ctx)
+                commandDidDispatch?.invoke(ctx, result)
+                result
+            } catch (e: Exception) {
+                source.printErr("An error occurred while running this command")
+                ExceptionInCommandBodyResult(source, ctx, e)
+            }
+        }
+
+        return CommandNotDispatchedResult(source, cmd)
     }
 
-    fun getVisible(sender: S?): List<C> {
-        val filter = sender == null
-        return commands.filter { filter || !it.isHiddenFor(sender!!) }
-    }
+    private operator fun List<CommandSpec>.get(alias: String) =
+            firstOrNull { it.name.equals(alias, true) }
 
-    open fun getHelpListing(fullCmd: String, sender: S?) = HelpListing(fullCmd, getVisible(sender).toMutableList())
-
-    open fun commandSelected(command: C): Boolean = true
-    open fun commandWillDispatch(context: CommandContext<C, S>) = true
-    open fun commandDidDispatch(context: CommandContext<C, S>) {}
-
-    operator fun contains(alias: String) = get(alias) != null
-
-    abstract fun copy(): CommandManager<C, S>
 }
