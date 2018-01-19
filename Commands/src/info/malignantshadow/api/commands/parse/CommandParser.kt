@@ -91,6 +91,10 @@ class CommandParser(val cmd: CommandSpec, val input: String) {
                     }
                 }
             }
+
+            // cease parsing immediately if a help flag is present
+            if(elements[elements.lastIndex].key!!.name in cmd.helpFlags) return@lazy elements
+
             token = tokenizer.next()
         }
 

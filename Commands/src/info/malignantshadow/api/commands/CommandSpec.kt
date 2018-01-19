@@ -30,6 +30,13 @@ class CommandSpec(
         val params: List<CommandParameter>,
 
         /**
+         * The names of parameters who are acting as help parameters. If one is
+         * found, then parsing will cease immediately, since other parameters
+         * will simply be ignored.
+         */
+        val helpFlags: List<String>,
+
+        /**
          * The 'extra' information that should be displayed in help listing.
          */
         val extra: CommandParameter?,
@@ -82,6 +89,11 @@ class CommandSpec(
      * The minimum amount of flags that a source must supply this command
      */
     val minFlags = flags.count { it.isRequired && it.types.isNotEmpty() }
+
+    /**
+     * Indicates whether this command has any flag parameters, including help flags.
+     */
+    val hasFlags = flags.isNotEmpty() || !helpFlags.isNotEmpty()
 
     init {
         allAliases.forEach {

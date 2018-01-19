@@ -148,6 +148,8 @@ class CommandManager(
             val message: String
     ) : CommandResult
 
+    data class HelpCommandResult(val type: Int, val data: Any) : CommandResult
+
     private fun notFound(source: CommandSource, name: String): CommandDispatchErrorResult {
         source.printErr("Command '%s' not found", name)
         return CommandDispatchErrorResult(source, name, CMD_NOT_FOUND)

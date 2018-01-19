@@ -1,6 +1,7 @@
 package info.malignantshadow.api.commands.build
 
 import info.malignantshadow.api.commands.CommandDsl
+import info.malignantshadow.api.commands.CommandManager
 import info.malignantshadow.api.commands.CommandParameter
 import info.malignantshadow.api.commands.CommandSpec
 import info.malignantshadow.api.commands.dispatch.CommandContext
@@ -19,7 +20,12 @@ class CommandSpecBuilder(
         /**
          * The description
          */
-        val desc: String
+        val desc: String,
+
+        /**
+         * The help function, passed to children
+         */
+        var defHelpFn: (CommandSpec) -> List<String> = DEF_HELP_FN
 ) {
 
     private val children = ArrayList<CommandSpec>()
@@ -29,6 +35,57 @@ class CommandSpecBuilder(
     private var sendableBy: ((CommandSource) -> Boolean) = { true }
     private var handler: ((CommandContext) -> CommandResult?)? = null
     private var hiddenFor: (CommandSource) -> Boolean = { false }
+    private var helpFlags: List<String> = emptyList()
+
+    companion object {
+
+        private val transformParam: (CommandParameter?) -> String = {
+            when {
+                it == null -> ""
+                it.isRequired -> "<${it.shownDisplay}>"
+                else -> "[${it.shownDisplay}]"
+            }
+        }
+
+        private val DEF_HELP_FN: (CommandSpec) -> List<String> = {
+            val help = ArrayList<String>()
+            help.add(it.desc)
+            if(it.params.isNotEmpty()) {
+                val usage = buildString {
+                    append("Usage: ")
+                    append(it.params.filter { !it.isFlag }.joinToString(" ", transform = transformParam))
+                    if (it.extra != null)
+                        append(" " + transformParam(it.extra))
+                    if (it.hasFlags)
+                        append(" " + if (it.minFlags > 0) "<Flags>" else "[Flags]")
+                }
+                help.add(usage)
+            }
+
+            if(it.nonFlags.isNotEmpty()) {
+                help.add("Arguments:")
+                it.nonFlags.forEach {
+                    help.add("  ${transformParam(it)} : ${it.desc}")
+                }
+            }
+
+            if(it.hasFlags) {
+                help.add("Flags:")
+                it.flags.forEach {
+                    help.add("  ${transformParam(it)} : ${it.desc}")
+                }
+            }
+
+            if(it.isParent) {
+                help.add("Commands:")
+                it.children.forEach {
+                    help.add("  ${it.allAliases.joinToString("/")} - ${it.desc}")
+                }
+            }
+
+            help
+        }
+    }
 
     private fun conflictsWith(other: CommandSpec): Boolean {
         if (other.hasAlias(name)) return true
@@ -44,8 +101,8 @@ class CommandSpecBuilder(
      * @see CommandSpec.name
      * @see CommandSpec.desc
      */
-    fun child(name: String, desc: String, init: CommandSpecBuilder.() -> Unit) : CommandSpec {
-        val child = build(CommandSpecBuilder(name, desc), init).build()
+    fun child(name: String, desc: String, init: CommandSpecBuilder.() -> Unit): CommandSpec {
+        val child = build(CommandSpecBuilder(name, desc, defHelpFn), init).build()
         child(child)
         return child
     }
@@ -262,7 +319,33 @@ class CommandSpecBuilder(
         hiddenFor = { true }
     }
 
+    /**
+     * Add a flag that, if present, will display help information for this command without running the original handler.
+     * The given names should not have a leading dash (`-`). Note that a parameter is not actually added to the command.
+     * Instead, the simple presence of a flag with any of the supplied names is tested.
+     *
+     * Note: *This must be called **after** [handler]*. The handler is wrapped inside another
+     * handler that first tests if a parameter with the given name is present.
+     *
+     * @param names The names of the parameter, without a leading dash. By default, if the flags
+     * '--help' or '-?' are present, help is shown, and the normal handler is not run.
+     * @param helpFn
+     */
+    fun withHelpParam(names: Iterable<String> = listOf("help", "?"), helpFn: (CommandSpec) -> List<String> = defHelpFn) {
+        helpFlags = names.map { "-$it" }
+
+        val wrapped = handler
+        handler { ctx ->
+            if (names.firstOrNull { "-$it" in ctx } != null) {
+                helpFn(ctx.cmd).forEach { ctx.source.print(it) }
+                CommandManager.HelpCommandResult(CommandManager.HELP_SENT, ctx.cmd)
+            } else {
+                wrapped?.invoke(ctx)
+            }
+        }
+    }
+
     internal fun build() =
-            CommandSpec(name, aliases, desc, params, extra, handler, children, sendableBy, hiddenFor)
+            CommandSpec(name, aliases, desc, params, helpFlags, extra, handler, children, sendableBy, hiddenFor)
 
 }

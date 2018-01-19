@@ -18,6 +18,7 @@ class CommandManagerBuilder {
     private var onSelect: ((CommandSource, CommandSpec) -> Boolean)? = null
     private var commandWillDispatch: ((CommandContext) -> Boolean)? = { true }
     private var commandDidDispatch: ((CommandContext, CommandResult?) -> Unit)? = null
+    private var helpFn: ((CommandSpec) -> List<String>)? = null
 
     /**
      * Add a command to the manager.
@@ -25,10 +26,18 @@ class CommandManagerBuilder {
      * @param name The command's name
      * @param desc The command's description
      */
-    fun command(name: String, desc: String, init: CommandSpecBuilder.() -> Unit) : CommandSpec {
-        val command = build(CommandSpecBuilder(name, desc), init).build()
+    fun command(name: String, desc: String, init: CommandSpecBuilder.() -> Unit): CommandSpec {
+        val command =
+                if (helpFn != null)
+                    build(CommandSpecBuilder(name, desc, helpFn!!), init).build()
+                else
+                    build(CommandSpecBuilder(name, desc), init).build()
         commands.add(command)
         return command
+    }
+
+    fun helpFn(fn: (CommandSpec) -> List<String>) {
+        helpFn = fn
     }
 
     /**
