@@ -43,13 +43,29 @@ class CommandContext(
     val args = args.filter { it.key != null }
 
     /**
+     * Indicates whether the specified parameter has any input.
      *
+     * @param name The name of the parameter
+     * @return `true` if the parameter was found and has input
      */
-    @JvmName("isPresent")
-    operator fun contains(name: String): Boolean = getElement(name)?.input?.isBlank() == false
+    fun hasInput(name: String): Boolean = getElement(name)?.input?.isBlank() == false
 
+    @JvmName("isPresent")
+    operator fun contains(name: String) : Boolean = getElement(name) != null
+
+    /**
+     * Get the command element associated with the give name
+     *
+     * @param name The name of the parameter
+     */
     fun getElement(name: String) = args.firstOrNull { it.key?.name == name }
 
+    /**
+     * Get the value of the specified parameter
+     *
+     * @param name The name of the parameter
+     * @return the values
+     */
     operator fun get(name: String)= getElement(name)?.value
 
 }
