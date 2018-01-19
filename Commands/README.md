@@ -31,3 +31,4 @@ specific to your application. Included error handling includes
   * an [exception ocurring](src/info/malignantshadow/api/commands/CommandManager.kt#L233)
    while the command is running
 * Simple indication that a command should show help if a flag is present. i.e. `mail --help` or `mail -?`
+  * This is not the default behavior, it has to be defined explicitly when building the command.
