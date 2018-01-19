@@ -45,10 +45,14 @@ class CommandSpecBuilder(val name: String, val desc: String) {
         children.forEach { child(it) }
     }
 
+    fun children(vararg children: CommandSpec) = children(listOf(*children))
+
     fun setChildren(children: Iterable<CommandSpec>) {
         this.children.clear()
         children(children)
     }
+
+    fun setChildren(vararg children: CommandSpec) = setChildren(listOf(*children))
 
     fun param(name: String, desc: String, display: String = "", init: CommandParameterBuilder.() -> Unit) : CommandParameter {
         val param = build(CommandParameterBuilder(name, desc, display), init).build()
@@ -67,10 +71,14 @@ class CommandSpecBuilder(val name: String, val desc: String) {
         parameters.forEach { param(it) }
     }
 
+    fun params(vararg parameters: CommandParameter) = params(listOf(*parameters))
+
     fun setParams(parameters: Iterable<CommandParameter>) {
         params.clear()
         params(parameters)
     }
+
+    fun setParams(vararg parameters: CommandParameter) = setParams(listOf(*parameters))
 
     fun extra(display: String, desc: String) {
         extra = CommandParameterBuilder(display, desc, "").build()
@@ -89,10 +97,14 @@ class CommandSpecBuilder(val name: String, val desc: String) {
         this.aliases.forEach { alias(it) }
     }
 
+    fun aliases(vararg aliases: String) = aliases(listOf(*aliases))
+
     fun setAliases(aliases: Iterable<String>) {
         this.aliases.clear()
         aliases(aliases)
     }
+
+    fun setAliases(vararg aliases: String) = setAliases(listOf(*aliases))
 
     fun handler(handler: (CommandContext) -> CommandResult?) {
         this.handler = handler

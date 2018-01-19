@@ -29,10 +29,14 @@ class CommandParameterBuilder(val name: String, val desc: String, val display: S
         this.types.addAll(types)
     }
 
+    fun types(vararg types: (String) -> Any?) = types(listOf(*types))
+
     fun setTypes(types: Iterable<(String) -> Any?>) {
         this.types.clear()
         types(types)
     }
+
+    fun setTypes(vararg types: (String) -> Any?) = types(listOf(*types))
 
     fun isRequired(required: Boolean = true) {
         isRequired = required
