@@ -21,6 +21,10 @@ class CommandParameterBuilder(val name: String, val desc: String, val display: S
         types.add(type)
     }
 
+    inline fun <reified E: Enum<E>> typeOf(caseSensitive: Boolean = false) {
+        typeOf(ParameterType.enumValue<E>(caseSensitive))
+    }
+
     fun types(types: Iterable<(String) -> Any?>) {
         this.types.addAll(types)
     }
