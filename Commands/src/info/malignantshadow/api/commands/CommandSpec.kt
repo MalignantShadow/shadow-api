@@ -39,11 +39,5 @@ class CommandSpec(
     fun getVisibleChildren(source: CommandSource) = children.filter { !it.isHiddenFor(source) }
     fun getSendableChildren(source: CommandSource) = children.filter { it.handler != null && it.isSendableBy(source) }
 
-    // TODO: DOCS | args not checked for validity
-    fun dispatch(source: CommandSource, args: List<CommandElement>) {
-        check(handler != null) { "This command does not have a handler" }
-        handler!!(CommandContext(this, source, args))
-    }
-
 
 }
