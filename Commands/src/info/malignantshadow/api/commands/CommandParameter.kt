@@ -59,6 +59,7 @@ class CommandParameter(
     }
 
     fun getValueFrom(input: String) =
-            if(input.isBlank() || types.isEmpty()) def else ParameterType.firstMatch(types)(input)
+            if(input.isBlank() || types.isEmpty()) def
+            else ParameterType.firstMatch(types)(input)
 
 }
