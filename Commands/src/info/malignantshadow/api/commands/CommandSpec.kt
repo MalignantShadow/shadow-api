@@ -22,6 +22,8 @@ class CommandSpec(
     val isParent = !children.isEmpty()
     val minArgs = params.filter { !it.isFlag }.count { it.isRequired }
 
+    val minFlags = params.filter { it.isFlag }.count { it.isRequired && !it.types.isEmpty() }
+
     init {
         allAliases.forEach {
             check(!it.startsWith("-")) { "A command cannot have an alias that starts with '-' (given: '$it')" }
