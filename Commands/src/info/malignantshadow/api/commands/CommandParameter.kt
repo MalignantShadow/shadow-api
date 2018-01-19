@@ -10,11 +10,38 @@ class CommandParameter(
          * a 'long' flag, one character marks it as a 'short' flag
          */
         val name: String,
+
+        /**
+         * The description
+         */
         val desc: String,
+
+        /**
+         * Indicates what should be shown in help listings instead of the name.
+         *
+         * This is a *HINT*
+         */
         val display: String,
+
+        /**
+         * The various ways input for this parameter can be parsed
+         */
         val types: List<(String) -> Any?>,
+
+        /**
+         * Indicates whether this parameter is required to have input. Ignored for flags without any
+         * input types.
+         */
         val isRequired: Boolean,
+
+        /**
+         * Whether the parsed value of this parameter is allowed to be `null`
+         */
         val isNullable: Boolean,
+
+        /**
+         * The default value of this parameter. Used when the parsed value is `null`
+         */
         val def: Any?
 ) {
 
