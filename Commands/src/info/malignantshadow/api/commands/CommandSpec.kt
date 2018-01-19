@@ -64,6 +64,11 @@ class CommandSpec(
     val flags = params.filter { it.isFlag }
 
     /**
+     * The parameters of this command that are not considered flags
+     */
+    val nonFlags = params.filter { !it.isFlag }
+
+    /**
      * Indicates whether this command has any children
      */
     val isParent = !children.isEmpty()
@@ -71,12 +76,12 @@ class CommandSpec(
     /**
      * The minimum amount of arguments that a source must supply this command
      */
-    val minArgs = params.filter { !it.isFlag }.count { it.isRequired }
+    val minArgs = nonFlags.count { it.isRequired }
 
     /**
      * The minimum amount of flags that a source must supply this command
      */
-    val minFlags = params.filter { it.isFlag }.count { it.isRequired && !it.types.isEmpty() }
+    val minFlags = flags.count { it.isRequired && it.types.isNotEmpty() }
 
     init {
         allAliases.forEach {
