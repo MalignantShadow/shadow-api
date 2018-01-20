@@ -80,4 +80,13 @@ class CommandContext(
      */
     operator fun get(name: String)= getElement(name)?.value
 
+    /**
+     * Get the value of the specified parameter cast to the supplied type
+     *
+     * @param T The type
+     * @param name The name of the parameter
+     */
+    @Suppress("unchecked_cast")
+    fun <T> getAs(name: String) = get(name) as T
+
 }
