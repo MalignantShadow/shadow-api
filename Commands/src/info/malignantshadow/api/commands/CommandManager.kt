@@ -230,6 +230,7 @@ class CommandManager(
                 commandDidDispatch?.invoke(ctx, result)
                 result
             } catch (e: Exception) {
+                e.printStackTrace()
                 source.printErr("An error occurred while running this command")
                 ExceptionInCommandBodyResult(source, ctx, e)
             }
