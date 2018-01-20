@@ -25,7 +25,7 @@ class CommandSpecBuilder(
         /**
          * The help function, passed to children
          */
-        var defHelpFn: (CommandSpec) -> List<String> = DEF_HELP_FN
+        var defHelpFn: (CommandSource, CommandSpec) -> List<String> = DEF_HELP_FN
 ) {
 
     private val children = ArrayList<CommandSpec>()
@@ -47,38 +47,38 @@ class CommandSpecBuilder(
             }
         }
 
-        private val DEF_HELP_FN: (CommandSpec) -> List<String> = {
+        private val DEF_HELP_FN: (CommandSource, CommandSpec) -> List<String> = { source, cmd ->
             val help = ArrayList<String>()
-            help.add(it.desc)
-            if(it.params.isNotEmpty()) {
+            help.add(cmd.desc)
+            if(cmd.params.isNotEmpty()) {
                 val usage = buildString {
                     append("Usage: ")
-                    append(it.params.filter { !it.isFlag }.joinToString(" ", transform = transformParam))
-                    if (it.extra != null)
-                        append(" " + transformParam(it.extra))
-                    if (it.hasFlags)
-                        append(" " + if (it.minFlags > 0) "<Flags>" else "[Flags]")
+                    append(cmd.params.filter { !it.isFlag }.joinToString(" ", transform = transformParam))
+                    if (cmd.extra != null)
+                        append(" " + transformParam(cmd.extra))
+                    if (cmd.hasFlags)
+                        append(" " + if (cmd.minFlags > 0) "<Flags>" else "[Flags]")
                 }
                 help.add(usage)
             }
 
-            if(it.nonFlags.isNotEmpty()) {
+            if(cmd.nonFlags.isNotEmpty()) {
                 help.add("Arguments:")
-                it.nonFlags.forEach {
+                cmd.nonFlags.forEach {
                     help.add("  ${transformParam(it)} : ${it.desc}")
                 }
             }
 
-            if(it.hasFlags) {
+            if(cmd.hasFlags) {
                 help.add("Flags:")
-                it.flags.forEach {
+                cmd.flags.forEach {
                     help.add("  ${transformParam(it)} : ${it.desc}")
                 }
             }
 
-            if(it.isParent) {
+            if(cmd.isParent) {
                 help.add("Commands:")
-                it.children.forEach {
+                cmd.getVisibleChildren(source).forEach {
                     help.add("  ${it.allAliases.joinToString("/")} - ${it.desc}")
                 }
             }
@@ -331,13 +331,13 @@ class CommandSpecBuilder(
      * '--help' or '-?' are present, help is shown, and the normal handler is not run.
      * @param helpFn
      */
-    fun withHelpParam(names: Iterable<String> = listOf("help", "?"), helpFn: (CommandSpec) -> List<String> = defHelpFn) {
+    fun withHelpParam(names: Iterable<String> = listOf("help", "?"), helpFn: (CommandSource, CommandSpec) -> List<String> = defHelpFn) {
         helpFlags = names.map { "-$it" }
 
         val wrapped = handler
         handler { ctx ->
             if (names.firstOrNull { "-$it" in ctx } != null) {
-                helpFn(ctx.cmd).forEach { ctx.source.print(it) }
+                helpFn(ctx.source, ctx.cmd).forEach { ctx.source.print(it) }
                 CommandManager.HelpCommandResult(CommandManager.HELP_SENT, ctx.cmd)
             } else {
                 wrapped?.invoke(ctx)

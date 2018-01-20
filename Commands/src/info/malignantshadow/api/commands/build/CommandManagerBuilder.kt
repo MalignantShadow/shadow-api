@@ -18,7 +18,7 @@ class CommandManagerBuilder {
     private var onSelect: ((CommandSource, CommandSpec) -> Boolean)? = null
     private var commandWillDispatch: ((CommandContext) -> Boolean)? = { true }
     private var commandDidDispatch: ((CommandContext, CommandResult?) -> Unit)? = null
-    private var helpFn: ((CommandSpec) -> List<String>)? = null
+    private var helpFn: ((CommandSource, CommandSpec) -> List<String>)? = null
 
     /**
      * Add a command to the manager.
@@ -36,7 +36,7 @@ class CommandManagerBuilder {
         return command
     }
 
-    fun helpFn(fn: (CommandSpec) -> List<String>) {
+    fun helpFn(fn: (CommandSource, CommandSpec) -> List<String>) {
         helpFn = fn
     }
 
