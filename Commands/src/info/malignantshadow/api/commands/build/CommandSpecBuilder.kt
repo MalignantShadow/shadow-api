@@ -165,7 +165,7 @@ class CommandSpecBuilder(
      * @see CommandParameter.desc
      * @see CommandParameter.display
      */
-    fun param(name: String, desc: String, display: String = "", init: CommandParameterBuilder.() -> Unit): CommandParameter {
+    fun param(name: String, desc: String, display: String = "", init: CommandParameterBuilder.() -> Unit = {}): CommandParameter {
         val param = build(CommandParameterBuilder(name, desc, display), init).build()
         param(param)
         return param
