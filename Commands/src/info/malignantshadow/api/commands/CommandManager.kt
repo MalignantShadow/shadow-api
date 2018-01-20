@@ -155,7 +155,7 @@ class CommandManager(
         return CommandDispatchErrorResult(source, name, CMD_NOT_FOUND)
     }
 
-    private fun requiresSub(source: CommandSource, cmd: CommandSpec) : CommandDispatchErrorResult {
+    private fun requiresSub(source: CommandSource, cmd: CommandSpec) : CommandResult {
         source.printErr("Command '%s' requires a sub-command", cmd.name)
         return CommandDispatchErrorResult(source, cmd.name, CMD_REQUIRES_SUB)
     }

@@ -43,6 +43,18 @@ class CommandContext(
     val args = args.filter { it.key != null }
 
     /**
+     * Returns `true` if the command wasn't given any input.
+     */
+    fun isEmpty() = args.isEmpty()
+
+    /**
+     * Indicates whether the command was given input
+     *
+     * @return `true` if the command was given input
+     */
+    fun isNotEmpty() = args.isNotEmpty()
+
+    /**
      * Indicates whether the specified parameter has any input.
      *
      * @param name The name of the parameter

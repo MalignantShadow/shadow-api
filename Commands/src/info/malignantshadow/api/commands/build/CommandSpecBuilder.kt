@@ -329,15 +329,14 @@ class CommandSpecBuilder(
      *
      * @param names The names of the parameter, without a leading dash. By default, if the flags
      * '--help' or '-?' are present, help is shown, and the normal handler is not run.
-     * @param helpFn
      */
-    fun withHelpParam(names: Iterable<String> = listOf("help", "?"), helpFn: (CommandSource, CommandSpec) -> List<String> = defHelpFn) {
+    fun withHelpParam(names: Iterable<String> = listOf("help", "?")) {
         helpFlags = names.map { "-$it" }
 
         val wrapped = handler
         handler { ctx ->
             if (names.firstOrNull { "-$it" in ctx } != null) {
-                helpFn(ctx.source, ctx.cmd).forEach { ctx.source.print(it) }
+                defHelpFn(ctx.source, ctx.cmd).forEach { ctx.source.print(it) }
                 CommandManager.HelpCommandResult(CommandManager.HELP_SENT, ctx.cmd)
             } else {
                 wrapped?.invoke(ctx)
@@ -345,7 +344,23 @@ class CommandSpecBuilder(
         }
     }
 
+    /**
+     * Indicate that this command should show help if it wasn't given any input
+     *
+     * Note: *This must be called **after** [handler]*. The handler is wrapped inside another
+     * handler that first tests if any input is present.
+     */
+    fun showHelpIfNoParams() {
+        val wrapped = handler
+        handler {ctx ->
+            if(ctx.isEmpty())
+                ctx.cmd.showHelp(ctx.source)
+            else
+                wrapped?.invoke(ctx)
+        }
+    }
+
     internal fun build() =
-            CommandSpec(name, aliases, desc, params, helpFlags, extra, handler, children, sendableBy, hiddenFor)
+            CommandSpec(name, aliases, desc, params, helpFlags, extra, handler, children, sendableBy, hiddenFor, defHelpFn)
 
 }

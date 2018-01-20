@@ -57,7 +57,9 @@ class CommandSpec(
          * A function to determine whether this command should be hidden from help listings
          * shown to the given command source
          */
-        val isHiddenFor: (CommandSource) -> Boolean
+        val isHiddenFor: (CommandSource) -> Boolean,
+
+        val helpFn: (CommandSource, CommandSpec) -> List<String>
 ) : CommandContainer(children) {
 
     /**
@@ -111,5 +113,15 @@ class CommandSpec(
      * @param alias The alias
      */
     fun hasAlias(alias: String) = allAliases.firstOrNull { it.equals(alias, true) } != null
+
+    /**
+     * Show this command's help to given command source
+     *
+     * @param source The source
+     */
+    fun showHelp(source: CommandSource): CommandManager.HelpCommandResult {
+        helpFn(source, this).forEach { source.print(it) }
+        return CommandManager.HelpCommandResult(CommandManager.HELP_SENT, this)
+    }
 
 }
