@@ -47,6 +47,16 @@ object ParameterType {
     val NUMBER: ParameterToken<Number?> = { input: String -> INT(input) ?: DOUBLE(input) }
 
     /**
+     * Parse the value as an IntRange, or null if it can't be parsed as such.
+     */
+    val INT_RANGE = fn@ { input: String ->
+        if (".." !in input) return@fn null
+
+        val split = input.split("..")
+        (INT(split[0]) ?: return@fn null)..(INT(split[1]) ?: return@fn null)
+    }
+
+    /**
      * Parse the input as a Boolean, or null if it can't be parsed as such.
      *
      * * Aside from `true`, `yes` and `on` are accepted inputs that evaluate to `true`
@@ -115,7 +125,7 @@ object ParameterType {
      * @param caseSensitive Whether the names/aliases of the Enum values are matched case-sensitive the input string
      * @return a function that returns an Enum value, or null if no match was found
      */
-    inline fun <reified E: Enum<E>> enumValue(caseSensitive: Boolean = false) =
+    inline fun <reified E : Enum<E>> enumValue(caseSensitive: Boolean = false) =
             enumValue(enumValues<E>().toList(), caseSensitive)
 
     /**
@@ -125,7 +135,7 @@ object ParameterType {
      * @param caseSensitive Whether the names/aliases of the Enum values are matched case-sensitive the input string
      * @return a function that returns an Enum value, or null if no match was found
      */
-    fun <E: Enum<E>> enumValue(values: Iterable<E>, caseSensitive: Boolean = false): ParameterToken<E?> =
+    fun <E : Enum<E>> enumValue(values: Iterable<E>, caseSensitive: Boolean = false): ParameterToken<E?> =
             firstMatch(values) { input: String?, it: E ->
                 if (it is Aliasable) {
                     //use the name property of Nameable instead of Enum
@@ -142,10 +152,10 @@ object ParameterType {
      * @param types The available parameter types
      * @return a function that returns the first match
      */
-    fun firstMatch(types: Iterable<(String) -> Any?>) : ParameterToken<Any?> = label@{ input: String ->
+    fun firstMatch(types: Iterable<(String) -> Any?>): ParameterToken<Any?> = label@ { input: String ->
         types.forEach {
             val v = it(input)
-            if(v != null) return@label v
+            if (v != null) return@label v
         }
         null
     }
@@ -158,8 +168,8 @@ object ParameterType {
      * @return a function that returns the first match
      */
     @JvmStatic
-    fun <T> firstMatch(values: Iterable<T>, predicate: (String, T) -> Boolean): ParameterToken<T?> = label@{ input: String ->
-        values.forEach { if(predicate(input, it)) return@label it }
+    fun <T> firstMatch(values: Iterable<T>, predicate: (String, T) -> Boolean): ParameterToken<T?> = label@ { input: String ->
+        values.forEach { if (predicate(input, it)) return@label it }
         null
     }
 

@@ -1,83 +1,66 @@
 package info.malignantshadow.api.util.selectors
 
-import info.malignantshadow.api.util.parsing.ParameterType
+import info.malignantshadow.api.util.parsing.Tokenizer
 
-open class Selector(val name: String, var args: ArrayList<SelectorArgument>) : Iterable<SelectorArgument> {
+class Selector(val name: String, var args: List<SelectorArgument>) : Iterable<SelectorArgument> {
 
-    fun add(name: String, vararg input: String) = add(SelectorArgument(name, arrayOf(*input)))
-    fun add(arg: SelectorArgument)  {
-        val index = args.indexOfFirst { it.name == arg.name }
-        if(index == -1) args.add(arg)
-        else args[index] = arg
-    }
+    companion object {
 
-    operator fun get(name: String) = args.firstOrNull { it.name == name }
+        val REGEX_PREFIXES = "[~!@#$]"
+        val REGEX_NAME = Tokenizer.REGEX_IDENTIFIER
+        val REGEX_VALUE = "(\\S+|${Tokenizer.string()})"
+        val REGEX_OP = "([<>=]|([!<>]=))"
+        val REGEX_PAIR = "$REGEX_NAME$REGEX_OP($REGEX_VALUE(\\|$REGEX_VALUE)*)"
+        val REGEX = Regex("$REGEX_PREFIXES$REGEX_NAME(\\[$REGEX_PAIR(,$REGEX_PAIR)*])?")
 
-    fun getInputFor(name: String) = get(name)?.input
-    fun hasInputFor(name: String) = getInputFor(name) != null
+        private val T_NAME = 0
+        private val T_OP = 1
+        private val T_VALUE = 2
+        private val T_NEXT = 3
+        private val T_END = 4
 
-    fun getAll(name: String) = getAll(name, ParameterType.STRING)
+        @JvmStatic
+        fun compile(string: String): Selector {
+            require(string.matches(REGEX)) { "Given string does not match the regex ${REGEX.pattern}" }
+            if ("[" !in string) return Selector(string, emptyList())
+            val name = string.substring(0..string.indexOf("["))
+            val tokenizer = Tokenizer(string.substring(name.length + 1)) // skip '['
+            tokenizer.addTokenType(REGEX_NAME, T_NAME)
+            tokenizer.addTokenType(REGEX_OP, T_OP)
+            tokenizer.addTokenType(REGEX_VALUE, T_VALUE)
+            tokenizer.addTokenType(",", T_NEXT)
+            tokenizer.addTokenType("]", T_END)
+            var token = tokenizer.next()!! //according to the regex, at least ']' is needed
+            val args = ArrayList<SelectorArgument>()
 
-    @JvmOverloads
-    fun <R> getAll(name: String, type: (String) -> R?, max: Int = -1): ArrayList<R?>? {
-        val arg = get(name) ?: return null
+            // Token types rarely check because the regex was tested against first
+            while(true) {
+                if(token.type == T_END)
+                    return Selector(name, args)
 
-        val arr = ArrayList<R?>()
-        if(arg.input.isEmpty() || max == 0) return arr
+                // must be name
+                val paramName = token.match
 
-        for((index, str) in arg.input.withIndex()) {
-            if(index == max - 1)
-                return arr
-            arr.add(type(str))
-        }
-        return arr
-    }
-
-    fun getOne(name: String) = getOne(name, ParameterType.STRING)
-    fun <R> getOne(name: String, type: (String) -> R?) = getAll(name, type, 1)?.getOrNull(0)
-
-    fun isSet(name: String) = get(name) != null
-
-    override fun iterator(): Iterator<SelectorArgument> = args.iterator()
-
-    override fun toString(): String {
-        var s = name
-        if(args.isEmpty()) return """$name[]"""
-
-        return """$name[${args.joinToString(",")}]"""
-    }
-
-    companion object Static {
-
-        val NAME_REGEX = """^[~!@#$%.*?]?\w+"""
-        val CONTEXT_REGEX = """$NAME_REGEX(\[[\w=$^~!-|*><,]*])?"""
-
-        fun compile(s: String?): Selector? {
-            if(s == null || !s.matches(Regex(CONTEXT_REGEX))) return null
-
-            val name = s.substring(0, if("[" in s) s.indexOf('[') else s.length)
-            if(!name.matches(Regex(NAME_REGEX))) return null
-
-            val selector = Selector(name, ArrayList())
-            if(name.length == s.length || s.length == name.length + 2) return selector // (no arguments)
-
-            val arguments = s.substring(s.indexOf('[') + 1, s.indexOf(']'))
-            val pairs = arguments.split(",")
-            for(p in pairs) {
-                if(p.isEmpty()) continue
-
-                val index = p.indexOf('=')
-                if(index == -1 || index == p.lastIndex) {
-                    selector.add(SelectorArgument(p, emptyArray()))
-                    continue
+                // must be operator
+                val op = when(tokenizer.next()!!.match) {
+                    "!="  -> SelectorArgument.OP_NOTEQ
+                    ">" -> SelectorArgument.OP_GREATER_THAN
+                    ">=" -> SelectorArgument.OP_GT_EQ
+                    "<" -> SelectorArgument.OP_LESS_THAN
+                    "<=" -> SelectorArgument.OP_LTEQ
+                    else -> SelectorArgument.OP_EQ
                 }
 
-                val argName = p.substring(0, index)
-                val input = p.substring(index + 1, p.length).split("\\|")
-                selector.add(SelectorArgument(argName, input.toTypedArray()))
+                //must be value/input
+                val input = tokenizer.next()!!.match.split(Regex(""))
+                args.add(SelectorArgument(paramName, op, input))
+
+                token = tokenizer.next()!!
             }
-            return selector
         }
+
     }
+
+    override fun iterator() = args.iterator()
 
 }
