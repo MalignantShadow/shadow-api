@@ -16,33 +16,6 @@ open class Tokenizer(src: String, val skipWhitespace: Boolean = true) {
     companion object {
 
         /**
-         * An unsigned Int. Matches 1 or more decimal characters (0-9)
-         */
-        const val REGEX_UINT = "\\d+\\b"
-
-        /**
-         * An (optionally) signed Int. Matches 1 or more decimal characters (0-9)
-         * proceeded by an optional sign (+ or -)
-         */
-        @JvmStatic
-        val REGEX_INT = "[+-]?$REGEX_UINT"
-
-        /**
-         * An unsigned Double. Matches any of the following number formats:
-         * * .#
-         * * .#e#
-         * * #.#
-         * * #.#e#
-         */
-        const val REGEX_UDOUBLE = "\\d*(\\.\\d+([eE][+-]?\\d+)?)\\b"
-
-        /**
-         * The same as a [REGEX_UDOUBLE], but proceeded by an optional sign (+ or -)
-         */
-        @JvmStatic
-        val REGEX_DOUBLE = "[+-]?$REGEX_UDOUBLE"
-
-        /**
          * An identifier that can contain alphanumeric characters and underscores. The identifier
          * will not match if it begins with a number, however.
          */
