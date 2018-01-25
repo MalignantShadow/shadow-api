@@ -11,4 +11,9 @@ interface Aliasable : Nameable {
      */
     val aliases: List<String>
 
+    operator fun contains(alias: String)= hasAlias(alias)
+
+    fun hasAlias(alias: String, ignoreCase: Boolean = false) =
+            alias.equals(name, ignoreCase) || aliases.any { it.equals(alias, ignoreCase) }
+
 }
