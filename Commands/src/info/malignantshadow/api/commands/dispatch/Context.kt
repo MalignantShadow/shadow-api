@@ -30,6 +30,11 @@ class Context(
 
     operator fun get(name: String) = params.firstOrNull { it.key?.name == name }?.value
 
+    fun groupFlags(name: String, vararg others: String): List<CommandInput> {
+        val givenAliases = listOf(name, *others)
+        return flags.filter { f -> givenAliases.any { (f.key as Flag).hasAlias(it) } }
+    }
+
     fun getFlagValue(name: String) = flags.firstOrNull { it.key?.name == name }?.value
 
     inline fun <R, reified T> get(key: String, fn: (T) -> R): R {
