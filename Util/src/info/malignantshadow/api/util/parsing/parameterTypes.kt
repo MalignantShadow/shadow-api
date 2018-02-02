@@ -204,7 +204,6 @@ object ParameterTypes {
                     it.aliases.forEach { alias -> if (alias.equals(input, ignoreCase)) return@parse it }
                 }
                 if (it.name.equals(input, ignoreCase)) return@parse it
-                return@parse it
             }
             return null
         }
