@@ -201,7 +201,7 @@ object ParameterTypes {
                 if (it is Aliasable) {
                     //use the name property of Nameable instead of Enum
                     if ((it as Nameable).name.equals(input, ignoreCase)) return@parse it
-                    it.aliases.forEach { alias -> if (alias.equals(input, ignoreCase)) return@parse it }
+                    it.hasAlias(input, ignoreCase)
                 }
                 if (it.name.equals(input, ignoreCase)) return@parse it
             }
