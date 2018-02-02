@@ -25,6 +25,7 @@ class FlagBuilder(
 
     fun requiredIf(name: String) {
         require(requiredIf.none { it != name }) { "Duplicate flag name '$name'" }
+        requiredIf.add(name)
     }
 
     fun requiredIf(name: String, vararg others: String) =
@@ -37,6 +38,7 @@ class FlagBuilder(
 
     fun requiredUnless(name: String) {
         require(requiredUnless.none { it != name }) { "Duplicate flag name '$name'" }
+        requiredUnless.add(name)
     }
 
     fun requiredUnless(name: String, vararg others: String) =
