@@ -5,6 +5,7 @@ import info.malignantshadow.api.commands.build.attributes.Describable
 import info.malignantshadow.api.commands.build.attributes.Parsable
 import info.malignantshadow.api.commands.build.attributes.SimpleDescribable
 import info.malignantshadow.api.commands.build.attributes.SimpleParsable
+import info.malignantshadow.api.util.parsing.ParameterTypes
 
 class ParameterBuilder(
         private val name: String,
@@ -19,7 +20,7 @@ class ParameterBuilder(
                     name,
                     describable.description,
                     parsable.usage,
-                    parsable.types,
+                    if(parsable.types.isEmpty()) listOf(ParameterTypes.STRING) else parsable.types,
                     parsable.nullable,
                     parsable.def
             )
