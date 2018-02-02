@@ -2,6 +2,10 @@ package info.malignantshadow.api.commands.build.attributes
 
 interface Describable {
 
+    /**
+     * Sets the description of this object
+     * @param desc The description
+     */
     fun description(desc: String)
 
 }

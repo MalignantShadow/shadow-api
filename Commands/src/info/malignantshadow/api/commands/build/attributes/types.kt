@@ -4,18 +4,48 @@ import info.malignantshadow.api.util.parsing.ParameterType
 
 interface Parsable {
 
+    /**
+     * Adds a [ParameterType] to this object.
+     */
     fun type(type: ParameterType<*>)
 
+    /**
+     * Adds multiple [ParameterType]s to this object.
+     * @param types The ParameterTypes to add
+     */
     fun types(types: Iterable<ParameterType<*>>) =
             types.forEach { type(it) }
 
+    /**
+     * Adds multiple [ParameterType]s to this object.
+     * @param first The first type
+     * @param second The second type
+     * @param others Other types to add
+     */
     fun types(first: ParameterType<*>, second: ParameterType<*>, vararg others: ParameterType<*>) =
             types(listOf(first, second, *others))
 
+    /**
+     * Sets whether this object can have a nullable value. An error will occur if this value is `false`
+     * and the parsed value from the given input is `null`.
+     */
     fun nullableValue(nullable: Boolean = true)
 
+    /**
+     * Sets the default value of this object. It is pointless to call this function on a parameter that is
+     * required to have input.
+     */
     fun defaultValue(def: Any?)
 
+    /**
+     * Sets the usage string of this object. For parameters, this is shown instead of the parameter's name, e.g.:
+     * * `[entity: string|int]`
+     * * `<entity: String|int>`
+     *
+     * For flags, this will be shown as the name of the flag's value, e.g.:
+     * * `-f VALUE`
+     * * `--flag=VALUE`
+     */
     fun usage(usage: String)
 
 }

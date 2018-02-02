@@ -2,11 +2,25 @@ package info.malignantshadow.api.commands.build.attributes
 
 interface Aliasable {
 
+    /**
+     * Adds an alias to this object
+     * @param alias The alias to add
+     */
     fun alias(alias: String)
 
+    /**
+     * Adds multiple aliases to this object
+     * @param aliases The aliases to add
+     */
     fun aliases(aliases: Iterable<String>) =
             aliases.forEach { alias(it) }
 
+    /**
+     * Adds multiple aliases to this object
+     * @param first The first alias
+     * @param second The second alias
+     * @param others Other aliases to add
+     */
     fun aliases(first: String, second: String, vararg others: String) =
             aliases(listOf(first, second, *others))
 
