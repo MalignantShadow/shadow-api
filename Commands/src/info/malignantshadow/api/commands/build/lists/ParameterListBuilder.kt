@@ -10,5 +10,10 @@ class ParameterListBuilder: CommandDslListBuilder<ParameterBuilder, Parameter>()
 
 }
 
+/**
+ * Creates a list of parameters.
+ *
+ * @param init Te extension function used to build the list
+ */
 fun parameters(init: ParameterListBuilder.() -> Unit) =
         build(ParameterListBuilder(), init).list

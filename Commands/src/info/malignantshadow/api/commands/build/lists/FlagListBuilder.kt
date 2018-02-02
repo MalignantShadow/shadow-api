@@ -10,5 +10,8 @@ class FlagListBuilder: CommandDslListBuilder<FlagBuilder, Flag>() {
 
 }
 
-fun flags(init: FlagListBuilder.() -> Unit) =
+/**
+ * Creates a list of flags
+ */
+fun flags(init: FlagListBuilder.() -> Unit): List<Flag> =
         build(FlagListBuilder(), init).list

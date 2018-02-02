@@ -11,6 +11,11 @@ abstract class CommandDslListBuilder<out B: CommandDslBuilder<T>, T> {
 
     internal abstract fun createBuilder(name: String): B
 
+    /**
+     *  Adds an element to this list after building it
+     *
+     *  @param init The extension function used for building the object
+     */
     infix fun String.has(init: B.() -> Unit): T {
         val v = build(createBuilder(this), init).build()
         list.add(v)
