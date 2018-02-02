@@ -214,6 +214,6 @@ object ParameterTypes {
     }
 
     inline fun <reified E : Enum<E>> enumValue(ignoreCase: Boolean = true) =
-            enumValue(kotlin.enumValues<E>().toList())
+            enumValue(kotlin.enumValues<E>().toList(), ignoreCase)
 
 }
