@@ -14,14 +14,9 @@ class ParameterBuilder(
 
     private var display = ""
 
-    fun display(display: String) {
-        this.display = display
-    }
-
     override fun build() =
             Parameter(
                     name,
-                    display,
                     describable.description,
                     parsable.usage,
                     parsable.types,

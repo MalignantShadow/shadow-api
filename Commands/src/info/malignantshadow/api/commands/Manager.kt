@@ -199,7 +199,7 @@ class Manager(
         // flag is required but not found in 'args'
         cmd.flags.forEach { f ->
             if (f.isRequired(flagsMapped) && flagInputs.none { !(it.key as Flag).aliases.any { f.hasAlias(it) } }) {
-                source.printErr("Missing required flag: '%s'", f.display)
+                source.printErr("Missing required flag: '%s'", f.shownDisplay)
                 return DispatchErrorResult(MISSING_FLAG, source, cmd, args)
             }
         }
@@ -208,7 +208,7 @@ class Manager(
         if (!ignoreUnnecessaryFlagInput) {
             val badFlag = flagInputs.firstOrNull { (it.key as Flag).requiresPresenceOnly && it.input != null }
             if (badFlag != null) {
-                source.printErr("Flag '%s' does not accept a value", badFlag.key!!.display)
+                source.printErr("Flag '%s' does not accept a value", badFlag.key!!.shownDisplay)
                 return DispatchErrorResult(FLAG_DOES_NOT_ACCEPT_VALUE, source, cmd, args)
             }
         }
@@ -241,7 +241,7 @@ class Manager(
             flag.isRequired && it.value == null && !flag.nullable
         }
         if (failedFlag != null) {
-            source.printErr("Invalid input for flag '%s' - %s", failedFlag.key!!.display, failedFlag.input)
+            source.printErr("Invalid input for flag '%s' - %s", failedFlag.key!!.shownDisplay, failedFlag.input)
             return DispatchErrorResult(INVALID_INPUT, source, cmd, args)
         }
 

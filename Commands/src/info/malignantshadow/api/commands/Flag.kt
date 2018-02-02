@@ -14,7 +14,7 @@ class Flag(
         val isRequired: Boolean,
         val requiredIf: List<String>,
         val requiredUnless: List<String>
-) : Parameter(name, "", description, usage, types, nullable, def), Aliasable {
+) : Parameter(name, description, usage, types, nullable, def), Aliasable {
 
     companion object {
 

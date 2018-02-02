@@ -6,7 +6,6 @@ import info.malignantshadow.api.util.parsing.ParameterTypes
 // TODO: Parameters can have custom validators
 open class Parameter(
         val name: String,
-        val display: String,
         val description: String,
         val usage: String?,
         val types: List<ParameterType<*>>,
@@ -16,7 +15,7 @@ open class Parameter(
 
     val type = ParameterTypes.first(types)
 
-    open val shownDisplay = if(display.isNotBlank()) display else name
+    open val shownDisplay = if(usage?.isNotBlank() == true) usage else name
 
     fun getValueFrom(input: String?) = if(input == null) def else type.parse(input)
 
