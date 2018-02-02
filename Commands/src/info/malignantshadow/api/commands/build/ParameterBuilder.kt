@@ -13,8 +13,6 @@ class ParameterBuilder(
         private val parsable: SimpleParsable = SimpleParsable()
 ): CommandDslBuilder<Parameter>(), Describable by describable, Parsable by parsable {
 
-    private var display = ""
-
     override fun build() =
             Parameter(
                     name,

@@ -19,33 +19,71 @@ class FlagBuilder(
     private var requiredIf = ArrayList<String>()
     private var requiredUnless = ArrayList<String>()
 
+    /**
+     * Indicate whether this flag requires input. The default behavior is `false`. This value
+     * is ignored if this flag has no available parameter types to parse the input.
+     *
+     * (Having no available parameter types indicates that the flag does not accept a value)
+     *
+     * @param required Whether this flag requires input
+     */
     fun requiredInput(required: Boolean) {
         isRequired = required
     }
 
+    /**
+     * Indicate that this flag has a required presence if another flag is present.
+     *
+     * @param name The name of the flag to make this flag required
+     */
     fun requiredIf(name: String) {
         require(requiredIf.none { it != name }) { "Duplicate flag name '$name'" }
         requiredIf.add(name)
     }
 
+    /**
+     * Indicate that this flag has a required presence if any of the given flags are present.
+     *
+     * @param name The name of a flag
+     * @param others Other flag names
+     */
     fun requiredIf(name: String, vararg others: String) =
         requiredIf(listOf(name, *others))
 
-
-    private fun requiredIf(names: Iterable<String>) {
+    /**
+     * Indicate this this flag is required if any of the given flags are present.
+     *
+     * @param names The names of the flags
+     */
+    fun requiredIf(names: Iterable<String>) {
         names.forEach { requiredIf(it) }
     }
 
+    /**
+     * Indicate that this flag has a required presence unless another flag is present.
+     *
+     * @param name The name of the flag
+     */
     fun requiredUnless(name: String) {
         require(requiredUnless.none { it != name }) { "Duplicate flag name '$name'" }
         requiredUnless.add(name)
     }
 
+    /**
+     * Indicate that this flag has a required presence unless one of the given flags are present.
+     *
+     * @param name The name of a flag
+     * @param others Other flag names
+     */
     fun requiredUnless(name: String, vararg others: String) =
             requiredUnless(listOf(name, *others))
 
-
-    private fun requiredUnless(names: Iterable<String>) {
+    /**
+     * Indicate this this flag is required unless one of the given flags are present.
+     *
+     * @param names The names of the flags
+     */
+    fun requiredUnless(names: Iterable<String>) {
         names.forEach { requiredUnless(it) }
     }
 
