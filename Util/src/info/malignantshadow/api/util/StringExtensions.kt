@@ -121,3 +121,21 @@ fun String.toProperCase(): String {
     }
     return result.trim { it <= ' ' }
 }
+
+fun String.wrap(maxLength: Int): List<String> {
+    val spaces = Regex("\\s+")
+    if(length <= maxLength || !contains(spaces)) return listOf(this)
+
+    val wrapped = ArrayList<String>()
+    var line = ""
+    for (str in split(spaces)) {
+        line += " $str"
+        if (line.length >= maxLength) {
+            wrapped.add(line.trim())
+            line = ""
+        }
+    }
+    if(line.isNotBlank())
+        wrapped.add(line.trim())
+    return wrapped
+}
