@@ -2,7 +2,6 @@ package info.malignantshadow.api.util.parsing
 
 import info.malignantshadow.api.util.aliases.Aliasable
 import info.malignantshadow.api.util.aliases.Nameable
-import info.malignantshadow.api.util.unescape
 import java.util.regex.Pattern
 
 interface ParameterType<out T> {
@@ -26,38 +25,6 @@ object ParameterTypes {
         override fun parse(input: String): String = input
 
         override fun complete(partial: String): List<String> = emptyList()
-
-    }
-
-    val QUOTED_STRING = object : ParameterType<String> {
-
-        override val pattern = Tokenizer.string()
-
-        override fun parse(input: String): String? {
-            if (!matches(input)) return null
-
-            return input.substring(1..input.lastIndex).unescape()
-        }
-
-        override fun complete(partial: String): List<String> {
-            if (matches(partial))
-                return emptyList()
-
-            val quote = partial[0]
-            if (!partial.endsWith(quote)) return listOf("$partial$quote")
-
-            return emptyList()
-        }
-
-    }
-
-    val EVERYTHING = object : ParameterType<String> {
-
-        override val pattern = ".*"
-
-        override fun parse(input: String) = input
-
-        override fun complete(partial: String) = emptyList<String>()
 
     }
 
