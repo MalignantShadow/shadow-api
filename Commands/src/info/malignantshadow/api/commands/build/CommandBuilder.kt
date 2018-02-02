@@ -72,10 +72,6 @@ class CommandBuilder(
         sourceRequirement = requirement
     }
 
-    fun helpFlag(name: String = "help") {
-        helpFlags(listOf(name))
-    }
-
     fun helpFlags(names: Iterable<String> = listOf("help", "h")) {
         helpFlags.addAll(names)
     }
