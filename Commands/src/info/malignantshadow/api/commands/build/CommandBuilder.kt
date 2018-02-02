@@ -69,7 +69,7 @@ class CommandBuilder(
     }
 
     fun sourceRequirement(requirement: (Source, Command) -> Boolean) {
-        sourceRequirement = sourceRequirement
+        sourceRequirement = requirement
     }
 
     fun helpFlag(name: String = "help") {
