@@ -18,9 +18,9 @@ interface ParameterType<out T> {
 
 object ParameterTypes {
 
-    val NON_WHITESPACE = object : ParameterType<String> {
+    val STRING = object : ParameterType<String> {
 
-        override val pattern = "\\S+"
+        override val pattern = ".*"
 
         override fun parse(input: String): String = input
 
