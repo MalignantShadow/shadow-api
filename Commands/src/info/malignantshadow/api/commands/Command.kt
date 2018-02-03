@@ -55,6 +55,7 @@ class Command(
                     if (parameterIndexIsRequired(index)) "<${it.shownDisplay}>"
                     else "[${it.shownDisplay}]"
                 }.forEach { append(" $it") }
+                if(extraArgUsage.isNotBlank()) append(" $extraArgUsage")
                 if(flags.isNotEmpty())
                     if (flags.count { it.isRequired || it.requiredUnless.isNotEmpty() } > 0)
                     append(" <options..>")
