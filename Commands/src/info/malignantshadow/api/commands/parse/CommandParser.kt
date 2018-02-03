@@ -6,13 +6,42 @@ import info.malignantshadow.api.commands.build.FlagBuilder
 import info.malignantshadow.api.util.parsing.Tokenizer
 import info.malignantshadow.api.util.unescape
 
+/**
+ * The helper object used to parse command input. Utilizes [Tokenizer]
+ *
+ * @author Shad0w (Caleb Downs)
+ */
 object CommandParser {
 
+    /**
+     * Token type denoting a `"quoted string"`
+     */
     const val QUOTED_STRING = 0
+
+    /**
+     * Token type denoting a short flag list, i.e. `-abcd`
+     */
     const val SHORT_FLAG_LIST = 1
+
+    /**
+     * Token type denoting a short flag with a potential value, i.e. `-a` or `-a VALUE`
+     */
     const val SHORT_FLAG_WITH_VALUE = 2
+
+    /**
+     * Token type denoting a long flag with a value, i.e. `--flag=VALUE` or `--flag="VALUE"`
+     */
     const val LONG_FLAG_WITH_VALUE = 3
+
+    /**
+     * Token type denoting a long flag without a value, i.e. `--flag`
+     */
     const val LONG_FLAG = 4
+
+    /**
+     * Token type denoting a group of non-whitespace characters that do not match any of
+     * the other tokens
+     */
     const val OTHER = 5
 
     private val string = Tokenizer.string()
@@ -21,6 +50,11 @@ object CommandParser {
     private val shortFlag = "-[a-zA-Z]"
     private val longFlag = "--[a-zA-Z-]+"
 
+    /**
+     * Returns a new [Tokenizer] to be used in command parsing
+     *
+     * @param input The arguments to parse
+     */
     fun getTokenizer(input: String): Tokenizer {
         val tokenizer = Tokenizer(input)
         tokenizer.addTokenType(Tokenizer.string(), QUOTED_STRING)
@@ -32,6 +66,13 @@ object CommandParser {
         return tokenizer
     }
 
+    /**
+     * Parse the arguments given to a command
+     *
+     * @param cmd The command being executed
+     * @param args The unparsed arguments given to the command
+     * @return The parsed arguments
+     */
     fun parse(cmd: Command, args: String): List<CommandInput> {
         val tokenizer = getTokenizer(args)
 
