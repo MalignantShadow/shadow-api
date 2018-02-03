@@ -14,11 +14,12 @@ class Command(
         val minArgs: Int,
         val extraArgUsage: String,
         val flags: List<Flag>,
-        val sourceRequirement: (Source, Command) -> Boolean,
+        private val sourceRequirement: (Source, Command) -> Boolean,
         children: List<Command>,
         private val handler: ((Context) -> Result?)?,
         val helpFlags: List<String>,
         val helpFn: (Command) -> List<String>
+        private val helpFn: (Command) -> List<String>
 ) : CommandContainer(children), Aliasable {
 
     companion object {
