@@ -1,5 +1,8 @@
 package info.malignantshadow.api.commands.dispatch
 
+/**
+ * Represents a command result.
+ */
 interface Result
 
 /**
