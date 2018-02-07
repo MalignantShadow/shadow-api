@@ -8,6 +8,8 @@ interface ParameterType<out T> {
 
     val pattern: String
 
+    val expected: String
+
     fun parse(input: String): T?
 
     fun complete(partial: String): List<String>
@@ -22,6 +24,8 @@ object ParameterTypes {
 
         override val pattern = ".*"
 
+        override val expected = "a string"
+
         override fun parse(input: String): String = input
 
         override fun complete(partial: String): List<String> = emptyList()
@@ -31,6 +35,8 @@ object ParameterTypes {
     val UNSIGNED_INT = object : ParameterType<Int> {
 
         override val pattern = "\\d+\\b"
+
+        override val expected = "a positive integer"
 
         override fun parse(input: String): Int? {
             if (!matches(input)) return null
@@ -45,11 +51,15 @@ object ParameterTypes {
 
         override val pattern = "[-+]?${UNSIGNED_INT.pattern}"
 
+        override val expected = "an integer"
+
     }
 
     val UNSIGNED_DOUBLE = object : ParameterType<Double> {
 
         override val pattern = "\\d*(\\.\\d+([eE][+-]?\\d+)?)\\b"
+
+        override val expected = "a positive number"
 
         override fun parse(input: String): Double? {
             if (!matches(input)) return null
@@ -67,15 +77,27 @@ object ParameterTypes {
 
         override val pattern: String = "[-+]?${UNSIGNED_DOUBLE.pattern}"
 
+        override val expected = "a number"
+
     }
 
-    val NUMBER = first(INT, DOUBLE)
+    val NUMBER = object : ParameterType<Number> by first(INT, DOUBLE) {
 
-    val UNSIGNED_NUMBER = first(UNSIGNED_INT, UNSIGNED_DOUBLE)
+        override val expected = "a number"
+
+    }
+
+    val UNSIGNED_NUMBER = object : ParameterType<Number> by first(UNSIGNED_INT, UNSIGNED_DOUBLE) {
+
+        override val expected = "a positive number"
+
+    }
 
     val HEX_INT = object : ParameterType<Int> {
 
         override val pattern: String = "#[a-fA-F0-9]+"
+
+        override val expected = "a hexidecimal integer"
 
         override fun parse(input: String): Int? {
             if (!matches(input)) return null
@@ -93,6 +115,8 @@ object ParameterTypes {
 
         override val pattern = "${INT.pattern}\\.\\.${INT.pattern}"
 
+        override val expected = "an integer range"
+
         override fun parse(input: String): IntRange? {
             if (!matches(input)) return null
             val split = input.split("..")
@@ -109,7 +133,11 @@ object ParameterTypes {
 
     }
 
-    val BOOLEAN = first(literal(true, "true"), literal(false, "false"))
+    val BOOLEAN = object : ParameterType<Boolean> by first(literal(true, "true"), literal(false, "false")) {
+
+        override val expected = "a boolean ('true' or 'false')"
+
+    }
 
     private fun regexChoice(patterns: List<String>) =
             patterns.joinToString(prefix = "(", postfix = ")", separator = "|") { it }
@@ -117,6 +145,8 @@ object ParameterTypes {
     fun <T> literal(value: T, keyword: String, ignoreCase: Boolean = true, vararg others: String) = object : ParameterType<T> {
 
         val keywords = listOf(keyword, *others)
+
+        override val expected = "one of the following: ${keywords.joinToString { "'$it'" }}"
 
         override val pattern =
                 keywords.joinToString(prefix = "(", postfix = ")", separator = "|") { Pattern.quote(it) }
@@ -135,6 +165,8 @@ object ParameterTypes {
 
         override val pattern = pattern
 
+        override val expected = "a string matching the regex /$pattern/"
+
         override fun parse(input: String) =
                 if (input.matches(Regex(pattern))) input else null
 
@@ -147,6 +179,8 @@ object ParameterTypes {
     fun <T> first(types: Iterable<ParameterType<T>>) = object : ParameterType<T> {
 
         override val pattern: String = regexChoice(types.map { it.pattern })
+
+        override val expected = types.joinToString { it.expected }
 
         override fun parse(input: String): T? {
 
@@ -171,6 +205,8 @@ object ParameterTypes {
 
         private val choices = listOf(first, second, *others)
 
+        override val expected = "one of the following: ${choices.joinToString { "'$it'" }}"
+
         override val pattern =
                 choices.joinToString(prefix = "${if (ignoreCase) "(?i)" else ""}(", postfix = ")", separator = "|") { Pattern.quote(it) }
 
@@ -191,6 +227,8 @@ object ParameterTypes {
 
         override val pattern: String = type.pattern
 
+        override val expected = "one of the following: ${choices.joinToString { "'$it'" }}"
+
         override fun complete(partial: String) = type.complete(partial)
 
         override fun parse(input: String): T? {
@@ -203,6 +241,8 @@ object ParameterTypes {
     fun range(min: Int, max: Int) = range(min..max)
 
     fun range(range: IntRange) = object : ParameterType<Int> by INT {
+
+        override val expected = "an integer between ${range.start} and ${range.endInclusive}"
 
         override fun parse(input: String): Int? {
             val v = INT.parse(input) ?: return null
@@ -224,13 +264,15 @@ object ParameterTypes {
 
                 override val pattern = "$typePattern($delimiter$typePattern)+"
 
+                override val expected = "a list of values that are ${type.expected}"
+
                 private fun tokenize(input: String): List<Tokenizer.Token> {
                     val tokens = ArrayList<Tokenizer.Token>()
                     val tokenizer = Tokenizer(input, false)
                     types.forEachIndexed { index, it -> tokenizer.addTokenType(it.pattern, index) }
                     tokenizer.addTokenType(delimiter, types.size)
                     var token = tokenizer.next()
-                    while(token != null) {
+                    while (token != null) {
                         tokens.add(token)
                         token = tokenizer.next()
                     }
@@ -245,13 +287,13 @@ object ParameterTypes {
                 private fun completeItem(item: String) = types.flatMap { it.complete(item) }
 
                 override fun complete(partial: String): List<String> {
-                    if(partial.isBlank() || Regex(delimiter) !in partial) return completeItem(partial)
+                    if (partial.isBlank() || Regex(delimiter) !in partial) return completeItem(partial)
 
                     val list = tokenize(partial)
                     val length = list.sumBy { it.match.length }
                     val beginning = partial.substring(0..length)
                     val sub = partial.substring(beginning.length)
-                    return if(list.last().type == types.size)
+                    return if (list.last().type == types.size)
                         completeItem(sub).map { beginning + it }
                     else
                         completeItem(list.last().match).map { beginning + it }
@@ -263,6 +305,8 @@ object ParameterTypes {
 
         override val pattern =
                 values.joinToString(prefix = "${if (ignoreCase) "(?i)" else ""}(", postfix = ")", separator = "|") { it.name }
+
+        override val expected = "one of the following: ${values.joinToString { "'${it.name}'" }}"
 
         override fun parse(input: String): E? {
             values.forEach {
