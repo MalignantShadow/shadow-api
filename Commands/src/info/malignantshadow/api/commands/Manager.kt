@@ -10,7 +10,7 @@ import info.malignantshadow.api.util.wrap
 class Manager(
         children: List<Command>,
         val beforeDispatch: (Context) -> Boolean,
-        val afterDispatch: (Context, Result?) -> Unit,
+        val afterDispatch: (Context, Any?) -> Unit,
         val sourceRequirementFallthrough: Boolean,
         val ignoreUnnecessaryFlagInput: Boolean
 ) : CommandContainer(children) {
@@ -115,15 +115,15 @@ class Manager(
 
     }
 
-    data class DispatchErrorResult(val type: Int, val source: Source, val cmd: Command, val args: List<CommandInput>) : Result
+    data class DispatchErrorResult(val type: Int, val source: Source, val cmd: Command, val args: List<CommandInput>)
 
-    data class CommandSearchErrorResult(val type: Int, val source: Source, val commandLine: String, val token: String) : Result
+    data class CommandSearchErrorResult(val type: Int, val source: Source, val commandLine: String, val token: String)
 
-    data class RequirementNotMetResult(val source: Source, val cmd: Command) : Result
+    data class RequirementNotMetResult(val source: Source, val cmd: Command)
 
-    data class CommandNotDispatchedResult(val context: Context) : Result
+    data class CommandNotDispatchedResult(val context: Context)
 
-    data class HelpShownResult(val source: Source, val cmd: Command, val flag: String) : Result
+    data class HelpShownResult(val source: Source, val cmd: Command, val flag: String)
 
     private fun reqNotMeet(source: Source, cmd: Command): RequirementNotMetResult {
         source.printErr("You are not allowed to run this command")
@@ -135,7 +135,7 @@ class Manager(
         return CommandSearchErrorResult(CMD_NOT_FOUND, source, command, name)
     }
 
-    fun dispatch(source: Source, command: String): Result? {
+    fun dispatch(source: Source, command: String): Any? {
         require(!command.isBlank()) { "Command string cannot be blank" }
         val tokenizer = CommandParser.getTokenizer(command)
         var token = tokenizer.next() // There should be a token if the string isn't blank
@@ -163,7 +163,7 @@ class Manager(
         }
     }
 
-    private fun checkAndDispatch(checkRequirement: Boolean, source: Source, cmd: Command, args: String): Result? {
+    private fun checkAndDispatch(checkRequirement: Boolean, source: Source, cmd: Command, args: String): Any? {
         if (checkRequirement && !cmd.isSendableBy(source)) return reqNotMeet(source, cmd)
         return dispatch(source, cmd, args)
     }
@@ -254,9 +254,9 @@ class Manager(
         return CommandNotDispatchedResult(context)
     }
 
-    fun dispatchUnsafe(source: Source, cmd: Command, args: List<CommandInput>): Result? = dispatchUnsafe(Context(source, cmd, args))
+    fun dispatchUnsafe(source: Source, cmd: Command, args: List<CommandInput>): Any? = dispatchUnsafe(Context(source, cmd, args))
 
-    private fun dispatchUnsafe(context: Context): Result? {
+    private fun dispatchUnsafe(context: Context): Any? {
         return try {
             Command.dispatchContext(context)
         } catch (e: Exception) {
