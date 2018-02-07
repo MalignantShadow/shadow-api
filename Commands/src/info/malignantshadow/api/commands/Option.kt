@@ -3,7 +3,7 @@ package info.malignantshadow.api.commands
 import info.malignantshadow.api.util.aliases.Aliasable
 import info.malignantshadow.api.util.parsing.ParameterType
 
-class Flag(
+class Option(
         name: String,
         override val aliases: List<String>,
         description: String,
@@ -45,7 +45,7 @@ class Flag(
             }.joinToString()
 
 
-    fun isRequired(others: List<Flag>): Boolean {
+    fun isRequired(others: List<Option>): Boolean {
         if (requiresPresenceOnly) return false
         if (isRequired) return true
         if (requiredUnless.isNotEmpty() && others.any { it.name in requiredUnless }) return false

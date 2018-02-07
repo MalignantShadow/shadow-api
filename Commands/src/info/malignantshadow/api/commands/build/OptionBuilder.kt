@@ -1,6 +1,6 @@
 package info.malignantshadow.api.commands.build
 
-import info.malignantshadow.api.commands.Flag
+import info.malignantshadow.api.commands.Option
 import info.malignantshadow.api.commands.build.attributes.Aliasable
 import info.malignantshadow.api.commands.build.attributes.Describable
 import info.malignantshadow.api.commands.build.attributes.Parsable
@@ -8,12 +8,12 @@ import info.malignantshadow.api.commands.build.attributes.SimpleAliasable
 import info.malignantshadow.api.commands.build.attributes.SimpleDescribable
 import info.malignantshadow.api.commands.build.attributes.SimpleParsable
 
-class FlagBuilder(
+class OptionBuilder(
         private val name: String,
         private val aliasable: SimpleAliasable = SimpleAliasable(),
         private val describable: SimpleDescribable = SimpleDescribable(),
         private val parsable: SimpleParsable = SimpleParsable()
-): CommandDslBuilder<Flag>(), Aliasable by aliasable, Describable by describable, Parsable by parsable {
+): CommandDslBuilder<Option>(), Aliasable by aliasable, Describable by describable, Parsable by parsable {
 
     private var isRequired = false
     private var requiredIf = ArrayList<String>()
@@ -42,7 +42,7 @@ class FlagBuilder(
     }
 
     /**
-     * Indicate that this flag has a required presence if any of the given flags are present.
+     * Indicate that this flag has a required presence if any of the given options are present.
      *
      * @param name The name of a flag
      * @param others Other flag names
@@ -51,9 +51,9 @@ class FlagBuilder(
         requiredIf(listOf(name, *others))
 
     /**
-     * Indicate this this flag is required if any of the given flags are present.
+     * Indicate this this flag is required if any of the given options are present.
      *
-     * @param names The names of the flags
+     * @param names The names of the options
      */
     fun requiredIf(names: Iterable<String>) {
         names.forEach { requiredIf(it) }
@@ -70,7 +70,7 @@ class FlagBuilder(
     }
 
     /**
-     * Indicate that this flag has a required presence unless one of the given flags are present.
+     * Indicate that this flag has a required presence unless one of the given options are present.
      *
      * @param name The name of a flag
      * @param others Other flag names
@@ -79,16 +79,16 @@ class FlagBuilder(
             requiredUnless(listOf(name, *others))
 
     /**
-     * Indicate this this flag is required unless one of the given flags are present.
+     * Indicate this this flag is required unless one of the given options are present.
      *
-     * @param names The names of the flags
+     * @param names The names of the options
      */
     fun requiredUnless(names: Iterable<String>) {
         names.forEach { requiredUnless(it) }
     }
 
     override fun build() =
-            Flag(
+            Option(
                     name,
                     aliasable.aliases,
                     describable.description,
