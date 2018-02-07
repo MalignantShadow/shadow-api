@@ -4,18 +4,18 @@ import info.malignantshadow.api.commands.Command
 import info.malignantshadow.api.commands.Manager
 import info.malignantshadow.api.commands.build.CommandBuilder
 import info.malignantshadow.api.commands.dispatch.Context
-import info.malignantshadow.api.commands.dispatch.Result
 import info.malignantshadow.api.util.build
 
 class ManagerBuilder : CommandDslListBuilder<CommandBuilder, Command>() {
 
     private var helpFn = Manager.DEFAULT_HELP_FUNCTION
     private var beforeDispatch: (Context) -> Boolean = { _ -> true }
-    private var afterDispatch: (Context, Result?) -> Unit = { _, _ -> }
+    private var afterDispatch: (Context, Any?) -> Unit = { _, _ -> }
     private var sourceRequirementFallthrough = false
     private var ignoreUnnecessaryFlagInput = false
+    private var operandRelation = Manager.OPERANDS_MIXED
 
-    override fun createBuilder(name: String): CommandBuilder = CommandBuilder(name, helpFn)
+    override fun createBuilder(name: String): CommandBuilder = CommandBuilder(name, helpFn, operandRelation)
 
     internal fun build() =
             Manager(
@@ -51,7 +51,7 @@ class ManagerBuilder : CommandDslListBuilder<CommandBuilder, Command>() {
      * [DispatchErrorResult][info.malignantshadow.api.commands.Manager.DispatchErrorResult] with a type of
      * [EXCEPTION_DURING_DISPATCH][info.malignantshadow.api.commands.Manager.EXCEPTION_DURING_DISPATCH]
      */
-    fun afterDispatch(fn: (Context, Result?) -> Unit) {
+    fun afterDispatch(fn: (Context, Any?) -> Unit) {
         afterDispatch = fn
     }
 
@@ -77,6 +77,32 @@ class ManagerBuilder : CommandDslListBuilder<CommandBuilder, Command>() {
      */
     fun ignoreUnnecessaryFlagInput(ignore: Boolean = true) {
         ignoreUnnecessaryFlagInput = ignore
+    }
+
+    /**
+     * Specifies that positional parameters and options of the commands in this manager are mixed
+     * (by default, can be overridden by a command).
+     */
+    fun operandsMixed() {
+        operandRelation = Manager.OPERANDS_MIXED
+    }
+
+    /**
+     * Specifies that positional parameters of the commands in this manager must precede options
+     * (by default, can be overridden by a command). If an argument is found
+     * that cannot be mapped to a flag, an error will occur.
+     */
+    fun operandsFirst() {
+        operandRelation = Manager.OPERANDS_FIRST
+    }
+
+
+    /**
+     * Specifies that options of the commands in this manager must precede positional
+     * parameters (POSIX-ly correct behavior). This behavior can be overridden by commands.
+     */
+    fun operandsLast() {
+        operandRelation = Manager.OPERANDS_LAST
     }
 
 }

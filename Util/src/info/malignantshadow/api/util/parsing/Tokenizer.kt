@@ -161,11 +161,20 @@ open class Tokenizer(src: String, val skipWhitespace: Boolean = true) {
      * @param regex The regex to use
      * @param type The type. This value should be used by the programmer later to determine
      * @param ignore Whether a Token of this type should be skipped (useful for comments).
-     * a Token's type
+     * The match is still consumed
      */
     @JvmOverloads
     fun addTokenType(regex: String, type: Int, ignore: Boolean = false) {
         _patterns.add(TokenInfo(Pattern.compile("^($regex)"), type, ignore))
+    }
+
+    /**
+     * Remove a Token type from this Tokenizer
+     *
+     * @param type The type
+     */
+    fun removeTokenType(type: Int) {
+        _patterns.removeIf { it.type == type }
     }
 
     /**

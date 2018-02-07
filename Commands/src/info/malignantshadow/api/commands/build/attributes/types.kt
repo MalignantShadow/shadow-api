@@ -42,7 +42,7 @@ interface Parsable {
      * * `[entity: string|int]`
      * * `<entity: String|int>`
      *
-     * For flags, this will be shown as the name of the flag's value, e.g.:
+     * For options, this will be shown as the name of the flag's value, e.g.:
      * * `-f VALUE`
      * * `--flag=VALUE`
      */

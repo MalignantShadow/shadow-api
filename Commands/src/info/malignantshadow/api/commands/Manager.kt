@@ -1,7 +1,6 @@
 package info.malignantshadow.api.commands
 
 import info.malignantshadow.api.commands.dispatch.Context
-import info.malignantshadow.api.commands.dispatch.Result
 import info.malignantshadow.api.commands.dispatch.Source
 import info.malignantshadow.api.commands.parse.CommandInput
 import info.malignantshadow.api.commands.parse.CommandParser
@@ -17,6 +16,11 @@ class Manager(
 
     companion object {
 
+        // flag and operands relation
+        const val OPERANDS_MIXED = 0 // default
+        const val OPERANDS_FIRST = 1
+        const val OPERANDS_LAST = 2 // POSIX-ly correct
+
         //dispatch error
         const val MISSING_FLAG = 0
         const val FLAG_DOES_NOT_ACCEPT_VALUE = 1
@@ -25,6 +29,8 @@ class Manager(
         const val INVALID_INPUT = 4
         const val EXCEPTION_DURING_DISPATCH = 5
         const val CMD_REQUIRES_SUB = 6
+        const val PARAMETER_AFTER_FLAG = 7
+        const val FLAG_AFTER_PARAMETER = 8
 
         //search error
         const val INVALID_CMD_NAME = 0
@@ -32,12 +38,12 @@ class Manager(
 
         val DEFAULT_HELP_FUNCTION = configuredHelpFn(7, 77)
 
-        fun configuredHelpFn(separatorLength: Int, maxLineLength: Int) = { cmd: Command ->
+        fun configuredHelpFn(separatorLength: Int, maxLineLength: Int) = { source: Source, cmd: Command ->
             // GNU-like command help
 
             // Command description
             //
-            // name <required> [optional] $extraArgUsage? [flags/options]
+            // name <required> [optional] $extraArgUsage? [options/options]
             // name <sub_command>
             // name --help
             //
@@ -75,9 +81,9 @@ class Manager(
             // determine the padLength by getting the longest
             // header length (command/flag names) and adding separatorLength
             var padLength = 0
-            val helpFlagUsage = cmd.helpFlags.joinToString { Flag.getDisplay(it) }
+            val helpFlagUsage = cmd.helpOptions.joinToString { Option.getDisplay(it) }
             cmd.children.forEach { padLength = Math.max(padLength, it.joinedAliases.length) }
-            cmd.flags.forEach { padLength = Math.max(padLength, it.computedUsage.length) }
+            cmd.options.forEach { padLength = Math.max(padLength, it.computedUsage.length) }
             padLength = Math.max(padLength, helpFlagUsage.length)
             padLength += separatorLength
 
@@ -85,15 +91,16 @@ class Manager(
                 help.add("")
                 help.add("Commands:")
                 cmd.children
+                        .filter { it.isSendableBy(source) }
                         .sortedBy { it.name }
                         .forEach { help.addAll(helpLines(it.joinedAliases, padLength, it.description, maxLineLength)) }
             }
 
-            if (cmd.hasFlags) {
+            if (cmd.hasOptions) {
                 help.add("")
                 help.add("Options:")
                 help.add("Mandatory arguments to long options are mandatory to short options too.")
-                cmd.flags.sortedBy { it.name }.forEach {
+                cmd.options.sortedBy { it.name }.forEach {
                     help.addAll(helpLines(it.computedUsage, padLength, it.description, maxLineLength))
 
                     // Note - you shouldn't mix required, requiredIf, or requiredUnless anyway
@@ -106,7 +113,7 @@ class Manager(
                     }
                 }
 
-                if (cmd.helpFlags.isNotEmpty())
+                if (cmd.helpOptions.isNotEmpty())
                     help.addAll(helpLines(helpFlagUsage, padLength, "Show this help message and then exit", maxLineLength))
             }
 
@@ -172,11 +179,11 @@ class Manager(
     fun dispatch(source: Source, cmd: Command, args: String) = dispatch(source, cmd, CommandParser.parse(cmd, args))
 
     // DOCS: "dispatch as if the given command was part of this manager, does not check permission"
-    fun dispatch(source: Source, cmd: Command, args: List<CommandInput>): Result? {
+    fun dispatch(source: Source, cmd: Command, args: List<CommandInput>): Any? {
         // if a help flag is present, show help for that command
-        val flagInputs = args.filter { it.key != null && it.key is Flag }
-        val flagsMapped = flagInputs.map { it.key as Flag }
-        val helpFlagName = cmd.helpFlags.firstOrNull { name -> flagInputs.any { (it.key as Flag).hasAlias(name) } }
+        val flagInputs = args.filter { it.key != null && it.key is Option }
+        val flagsMapped = flagInputs.map { it.key as Option }
+        val helpFlagName = cmd.helpOptions.firstOrNull { name -> flagInputs.any { (it.key as Option).hasAlias(name) } }
         if (helpFlagName != null) {
             cmd.showHelp(source)
             return HelpShownResult(source, cmd, helpFlagName)
@@ -187,18 +194,43 @@ class Manager(
             return DispatchErrorResult(CMD_REQUIRES_SUB, source, cmd, args)
         }
 
+        // check the order of options/parameters
+        // ignore if relation is MIXED
+        if (cmd.operandRelation != OPERANDS_MIXED) {
+            var last: Parameter? = null
+            var firstCheck = true
+            args.map { it.key }.forEach {
+                if (firstCheck) {
+                    firstCheck = false
+                    return@forEach
+                }
+
+                // a flag denotes the end of positional parameters, so finding a parameter is an error
+                if (cmd.operandRelation == OPERANDS_FIRST && last is Option && (it == null || it !is Option)) {
+                    source.printErr("Positional arguments can only be defined before all options")
+                    return DispatchErrorResult(PARAMETER_AFTER_FLAG, source, cmd, args)
+                }
+                if(cmd.operandRelation == OPERANDS_LAST && (last == null || last !is Option) && it is Option) {
+                    source.printErr("Flags can only be defined before positional arguments")
+                    return DispatchErrorResult(FLAG_AFTER_PARAMETER, source, cmd, args)
+                }
+
+                    last = it
+            }
+        }
+
         // test arg count
         // this includes keys which are null, so extra arguments are included as well
-        val paramInputs = args.filter { it.key !is Flag}
-        val argCount = paramInputs.count {it.input != null}
+        val paramInputs = args.filter { it.key !is Option }
+        val argCount = paramInputs.count { it.input != null }
         if (argCount < cmd.minArgs) {
             source.printErr("Expected %d arguments, but received %d", cmd.minArgs, argCount)
             return DispatchErrorResult(NOT_ENOUGH_ARGS, source, cmd, args)
         }
 
         // flag is required but not found in 'args'
-        cmd.flags.forEach { f ->
-            if (f.isRequired(flagsMapped) && flagInputs.none { !(it.key as Flag).aliases.any { f.hasAlias(it) } }) {
+        cmd.options.forEach { f ->
+            if (f.isRequired(flagsMapped) && flagInputs.none { !(it.key as Option).aliases.any { f.hasAlias(it) } }) {
                 source.printErr("Missing required flag: '%s'", f.shownDisplay)
                 return DispatchErrorResult(MISSING_FLAG, source, cmd, args)
             }
@@ -206,21 +238,21 @@ class Manager(
 
         // flag was given input when not needed
         if (!ignoreUnnecessaryFlagInput) {
-            val badFlag = flagInputs.firstOrNull { (it.key as Flag).requiresPresenceOnly && it.input != null }
+            val badFlag = flagInputs.firstOrNull { (it.key as Option).requiresPresenceOnly && it.input != null }
             if (badFlag != null) {
-                source.printErr("Flag '%s' does not accept a value", badFlag.key!!.shownDisplay)
+                source.printErr("Option '%s' does not accept a value", badFlag.key!!.shownDisplay)
                 return DispatchErrorResult(FLAG_DOES_NOT_ACCEPT_VALUE, source, cmd, args)
             }
         }
 
         //flag is missing input
         val missingValue = flagInputs.firstOrNull {
-            (it.key as Flag).isRequired(flagsMapped)
+            (it.key as Option).isRequired(flagsMapped)
                     && !it.key.nullable
                     && it.input == null
         }
         if (missingValue != null) {
-            source.printErr("Flag '%s' requires a value, but was not given one", missingValue.key!!.name)
+            source.printErr("Option '%s' requires a value, but was not given one", missingValue.key!!.name)
             return DispatchErrorResult(FLAG_MISSING_VALUE, source, cmd, args)
         }
 
@@ -235,9 +267,9 @@ class Manager(
             return DispatchErrorResult(INVALID_INPUT, source, cmd, args)
         }
 
-        // test valid inputs for flags
+        // test valid inputs for options
         val failedFlag = flagInputs.firstOrNull {
-            val flag = it.key as Flag
+            val flag = it.key as Option
             flag.isRequired && it.value == null && !flag.nullable
         }
         if (failedFlag != null) {

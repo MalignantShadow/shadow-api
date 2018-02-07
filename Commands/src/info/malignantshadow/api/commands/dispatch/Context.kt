@@ -1,7 +1,7 @@
 package info.malignantshadow.api.commands.dispatch
 
 import info.malignantshadow.api.commands.Command
-import info.malignantshadow.api.commands.Flag
+import info.malignantshadow.api.commands.Option
 import info.malignantshadow.api.commands.parse.CommandInput
 
 /**
@@ -31,13 +31,13 @@ class Context(
      * Arguments given to defined command parameters. This includes all command parameters,
      * even if the parameter was not given any input. (In this case, `input` will be `null`)
      */
-    val params = givenArgs.filter { it.key != null && it.key !is Flag }
+    val params = givenArgs.filter { it.key != null && it.key !is Option }
 
     /**
-     * Arguments given to flags. If a flag was defined by a [Source] more than once,
+     * Arguments given to options. If a flag was defined by a [Source] more than once,
      * there will be one [CommandInput] for each occurrence of the flag.
      */
-    val flags = givenArgs.filter { it.key != null && it.key is Flag }
+    val options = givenArgs.filter { it.key != null && it.key is Option }
 
     /**
      * Arguments supplied to the command that are not associated with any parameter.
@@ -60,10 +60,10 @@ class Context(
     fun component3() = params
 
     /**
-     * Arguments given to flags. If a flag was defined by a [Source] more than once,
+     * Arguments given to options. If a flag was defined by a [Source] more than once,
      * there will be one [CommandInput] for each occurrence of the flag.
      */
-    fun component4() = flags
+    fun component4() = options
 
     /**
      * Arguments supplied to the command that are not associated with any parameter.
@@ -71,11 +71,11 @@ class Context(
     fun component5() = extra
 
     /**
-     * Indicates whether a flag with the given alias was supplied to the command.
+     * Indicates whether an option with the given alias was supplied to the command.
      *
      * @param name The name of the flag
      */
-    fun flagIsPresent(name: String) = flags.any { it.key?.name == name }
+    fun optionIsPresent(name: String) = options.any { it.key?.name == name }
 
     /**
      * Gets the value of the parameter with the given name.
@@ -85,14 +85,14 @@ class Context(
     operator fun get(name: String) = params.firstOrNull { it.key?.name == name }?.value
 
     /**
-     * Gets a list of flags whose names or aliases match any of the given aliases
+     * Gets a list of options whose names or aliases match any of the given aliases
      *
-     * @param name The name of a flag
-     * @param others Other flag names
+     * @param name The name of an option
+     * @param others Other option names
      */
-    fun groupFlags(name: String, vararg others: String): List<CommandInput> {
+    fun groupOptions(name: String, vararg others: String): List<CommandInput> {
         val givenAliases = listOf(name, *others)
-        return flags.filter { f -> givenAliases.any { (f.key as Flag).hasAlias(it) } }
+        return options.filter { f -> givenAliases.any { (f.key as Option).hasAlias(it) } }
     }
 
     /**
@@ -100,7 +100,7 @@ class Context(
      *
      * @param name The name of a flag
      */
-    fun getFlagValue(name: String) = flags.firstOrNull { it.key?.name == name }?.value
+    fun getFlagValue(name: String) = options.firstOrNull { it.key?.name == name }?.value
 
     /**
      * Retrieves the value of the parameter with the given name, passes it to the given

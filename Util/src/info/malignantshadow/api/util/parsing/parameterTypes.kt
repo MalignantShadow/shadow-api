@@ -131,6 +131,17 @@ object ParameterTypes {
 
     }
 
+    fun matchesPattern(pattern: String) = object : ParameterType<String> {
+
+        override val pattern = pattern
+
+        override fun parse(input: String) =
+                if (input.matches(Regex(pattern))) input else null
+
+        override fun complete(partial: String) = emptyList<String>()
+
+    }
+
     fun <T> first(vararg types: ParameterType<T>) = first(listOf(*types))
 
     fun <T> first(types: Iterable<ParameterType<T>>) = object : ParameterType<T> {
@@ -154,42 +165,99 @@ object ParameterTypes {
 
     }
 
-    fun choices(ignoreCase: Boolean = true, vararg choices: String): ParameterType<String> {
-        require(choices.isNotEmpty()) { "'choices' must not be empty" }
-        return object : ParameterType<String> {
+    fun choices(first: String, second: String, vararg others: String) = choices(true, first, second, *others)
 
-            override val pattern =
-                    choices.joinToString(prefix = "${if (ignoreCase) "(?i)" else ""}(", postfix = ")", separator = "|") { Pattern.quote(it) }
+    fun choices(ignoreCase: Boolean, first: String, second: String, vararg others: String) = object : ParameterType<String> {
 
-            override fun parse(input: String) =
-                    if (choices.any { it.equals(input, ignoreCase) }) input
-                    else null
+        private val choices = listOf(first, second, *others)
 
-            override fun complete(partial: String): List<String> =
-                    choices.filter { it.startsWith(partial, ignoreCase) }
+        override val pattern =
+                choices.joinToString(prefix = "${if (ignoreCase) "(?i)" else ""}(", postfix = ")", separator = "|") { Pattern.quote(it) }
 
-        }
+        override fun parse(input: String) =
+                if (choices.any { it.equals(input, ignoreCase) }) input
+                else null
+
+        override fun complete(partial: String): List<String> =
+                choices.filter { it.startsWith(partial, ignoreCase) }
+
     }
 
-//    fun <T> listOf(type: ParameterType<T>, allowSpaces: Boolean = false, vararg others: ParameterType<T>) = object : ParameterType<List<T>> {
-//
-//        val types = kotlin.collections.listOf(type, *others)
-//
-//        val typePattern = regexChoice(types.map { it.pattern })
-//        private val spaces = if (allowSpaces) "\\s*" else ""
-//
-//        override val pattern = "$typePattern($spaces,$typePattern)+"
-//
-//        override fun parse(input: String): List<T>? {
-//            if (!matches(input)) return emptyList()
-//
-//        }
-//
-//        override fun complete(partial: String): List<String> {
-//            // complete last token
-//        }
-//
-//    }
+    fun choices(first: Int, second: Int, vararg others: Int) = choices(INT, first, second, *others.toTypedArray())
+
+    fun <T> choices(type: ParameterType<T>, first: T, second: T, vararg others: T) = choices(type, listOf(first, second, *others))
+
+    fun <T> choices(type: ParameterType<T>, choices: Iterable<T>) = object : ParameterType<T> {
+
+        override val pattern: String = type.pattern
+
+        override fun complete(partial: String) = type.complete(partial)
+
+        override fun parse(input: String): T? {
+            val v = type.parse(input) ?: return null
+            return if (v in choices) return v else null
+        }
+
+    }
+
+    fun range(min: Int, max: Int) = range(min..max)
+
+    fun range(range: IntRange) = object : ParameterType<Int> by INT {
+
+        override fun parse(input: String): Int? {
+            val v = INT.parse(input) ?: return null
+            return if (v in range) v else null
+        }
+
+    }
+
+    fun <T> listOf(type: ParameterType<T>, vararg others: ParameterType<T>) =
+            ParameterTypes.listOf(",", type, *others)
+
+
+    fun <T> listOf(delimiter: String, type: ParameterType<T>, vararg others: ParameterType<T>) =
+            object : ParameterType<List<T>> {
+
+                val types = kotlin.collections.listOf(type, *others)
+
+                val typePattern = regexChoice(types.map { it.pattern })
+
+                override val pattern = "$typePattern($delimiter$typePattern)+"
+
+                private fun tokenize(input: String): List<Tokenizer.Token> {
+                    val tokens = ArrayList<Tokenizer.Token>()
+                    val tokenizer = Tokenizer(input, false)
+                    types.forEachIndexed { index, it -> tokenizer.addTokenType(it.pattern, index) }
+                    tokenizer.addTokenType(delimiter, types.size)
+                    var token = tokenizer.next()
+                    while(token != null) {
+                        tokens.add(token)
+                        token = tokenizer.next()
+                    }
+                    return tokens
+                }
+
+                override fun parse(input: String): List<T>? {
+                    if (!matches(input)) return null
+                    return tokenize(input).filter { it.type != types.size }.map { types[it.type].parse(it.match)!! }
+                }
+
+                private fun completeItem(item: String) = types.flatMap { it.complete(item) }
+
+                override fun complete(partial: String): List<String> {
+                    if(partial.isBlank() || Regex(delimiter) !in partial) return completeItem(partial)
+
+                    val list = tokenize(partial)
+                    val length = list.sumBy { it.match.length }
+                    val beginning = partial.substring(0..length)
+                    val sub = partial.substring(beginning.length)
+                    return if(list.last().type == types.size)
+                        completeItem(sub).map { beginning + it }
+                    else
+                        completeItem(list.last().match).map { beginning + it }
+                }
+
+            }
 
     fun <E : Enum<E>> enumValue(values: Iterable<E>, ignoreCase: Boolean = true) = object : ParameterType<E> {
 

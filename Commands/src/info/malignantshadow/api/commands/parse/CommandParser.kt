@@ -1,8 +1,8 @@
 package info.malignantshadow.api.commands.parse
 
 import info.malignantshadow.api.commands.Command
-import info.malignantshadow.api.commands.Flag
-import info.malignantshadow.api.commands.build.FlagBuilder
+import info.malignantshadow.api.commands.Option
+import info.malignantshadow.api.commands.build.OptionBuilder
 import info.malignantshadow.api.util.parsing.Tokenizer
 import info.malignantshadow.api.util.unescape
 
@@ -44,6 +44,11 @@ object CommandParser {
      */
     const val OTHER = 5
 
+    /**
+     * Token type indicating that options should no longer be parsed
+     */
+    const val END_FLAGS = 6
+
     private val string = Tokenizer.string()
     private val otherNotFlag = "[^-]\\S*"
     private val flagValue = "($otherNotFlag|$string)"
@@ -58,6 +63,7 @@ object CommandParser {
     fun getTokenizer(input: String): Tokenizer {
         val tokenizer = Tokenizer(input)
         tokenizer.addTokenType(Tokenizer.string(), QUOTED_STRING)
+        tokenizer.addTokenType("--", END_FLAGS)
         tokenizer.addTokenType("$shortFlag{2,}", SHORT_FLAG_LIST)
         tokenizer.addTokenType("$shortFlag(\\s+$flagValue)?", SHORT_FLAG_WITH_VALUE)
         tokenizer.addTokenType("$longFlag=$flagValue", LONG_FLAG_WITH_VALUE)
@@ -118,10 +124,16 @@ object CommandParser {
                     flags.add(CommandInput(getFlag(cmd, token.match.substring(2)), null))
                     testFlags = true
                 }
+                END_FLAGS -> {
+                    tokenizer.removeTokenType(SHORT_FLAG_LIST)
+                    tokenizer.removeTokenType(SHORT_FLAG_WITH_VALUE)
+                    tokenizer.removeTokenType(LONG_FLAG)
+                    tokenizer.removeTokenType(LONG_FLAG_WITH_VALUE)
+                }
             }
 
             // if a help flag is present, stop immediately because the values are unused anyway
-            if (testFlags && flags.any { f -> cmd.helpFlags.any { (f.key as Flag).hasAlias(it) } })
+            if (testFlags && flags.any { f -> cmd.helpOptions.any { (f.key as Option).hasAlias(it) } })
                 return flags
         }
 
@@ -135,6 +147,6 @@ object CommandParser {
     }
 
     private fun getFlag(cmd: Command, name: String) =
-            cmd.flags.firstOrNull { it.hasAlias(name) } ?: FlagBuilder(name).build()
+            cmd.options.firstOrNull { it.hasAlias(name) } ?: OptionBuilder(name).build()
 
 }
